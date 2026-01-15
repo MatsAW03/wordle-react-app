@@ -1,4 +1,7 @@
+import "./Game.css";
 import React, { useEffect, useState, useRef } from "react";
+import Row from "./Row";
+import { WORD_LENGTH, MAX_GUESSES } from "./constants";
 
 function Game() {
   const API_URL =
@@ -6,6 +9,7 @@ function Game() {
 
   const validWordsRef = useRef(null);
   const [solution, setSolution] = useState("");
+  const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
 
   useEffect(() => {
     const fetchWord = async () => {
@@ -28,8 +32,10 @@ function Game() {
   }, []);
 
   return (
-    <div className="game-card">
-      <p>{solution}</p>
+    <div className="game-board">
+      {guesses.map((guess, i) => {
+        return <Row key={i} guess={guess ?? ""} />;
+      })}
     </div>
   );
 }
