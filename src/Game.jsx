@@ -4,7 +4,7 @@ import Row from "./Row";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
 
 function Game() {
-  const validWordsRef = useRef(null);
+  const validWordsRef = useRef(new Set());
   const [solution, setSolution] = useState("");
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
 
@@ -14,11 +14,9 @@ function Game() {
         const response = await fetch("/wordlist.json");
         const words = await response.json();
 
-        const normalized = words.map((w) => w.toLowerCase());
-        const randomWord =
-          normalized[Math.floor(Math.random() * normalized.length)];
+        const randomWord = words[Math.floor(Math.random() * words.length)];
 
-        validWordsRef.current = new Set(normalized);
+        validWordsRef.current = new Set(words);
         setSolution(randomWord);
       } catch (error) {
         console.error(error);
