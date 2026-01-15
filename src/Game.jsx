@@ -4,9 +4,6 @@ import Row from "./Row";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
 
 function Game() {
-  const API_URL =
-    "https://random-word-api.herokuapp.com/word?length=5&number=10000";
-
   const validWordsRef = useRef(null);
   const [solution, setSolution] = useState("");
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
@@ -14,7 +11,7 @@ function Game() {
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch("/wordlist.json");
         const words = await response.json();
 
         const normalized = words.map((w) => w.toLowerCase());
