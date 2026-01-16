@@ -13,3 +13,15 @@
   align-items: center;
   text-transform: uppercase;
 }
+
+.correct {
+  background-color: lightgreen;
+}
+
+.misplaced {
+  background-color: khaki;
+}
+
+.incorrect {
+  background-color: lightgray;
+}
