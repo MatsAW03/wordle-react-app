@@ -7,6 +7,17 @@ function Game() {
   const validWordsRef = useRef(new Set());
   const [solution, setSolution] = useState("");
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
+  const [currentGuess, setCurrentGuess] = useState("");
+
+  useEffect(() => {
+    const handleTyping = (event) => {
+      setCurrentGuess(currentGuess + event.key);
+    };
+
+    window.addEventListener("keydown", handleTyping);
+
+    return () => window.removeEventListener("keydown", handleTyping);
+  }, [currentGuess]);
 
   useEffect(() => {
     const fetchWord = async () => {
@@ -29,7 +40,10 @@ function Game() {
   return (
     <div className="game-board">
       {guesses.map((guess, i) => {
-        return <Row key={i} guess={guess ?? ""} />;
+        const isCurrentGuess = i === guesses.findIndex((val) => val == null);
+        return (
+          <Row key={i} guess={isCurrentGuess ? currentGuess : (guess ?? "")} />
+        );
       })}
     </div>
   );
