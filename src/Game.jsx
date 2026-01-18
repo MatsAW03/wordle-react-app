@@ -40,7 +40,10 @@ function Game() {
         return;
       }
 
-      setCurrentGuess(currentGuess + event.key);
+      const isLetter = event.key.match(/^[a-z]{1}$/) != null;
+      if (isLetter) {
+        setCurrentGuess(currentGuess + event.key);
+      }
     };
 
     window.addEventListener("keydown", handleTyping);
