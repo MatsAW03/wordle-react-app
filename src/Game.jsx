@@ -16,6 +16,8 @@ function Game() {
         return;
       }
 
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+
       if (event.key === "Enter") {
         if (currentGuess.length !== 5) {
           return;
@@ -29,10 +31,11 @@ function Game() {
         if (isCorrect) {
           setIsGameOver(true);
         }
+        return;
       }
 
       if (event.key === "Backspace") {
-        setCurrentGuess(currentGuess.slice(0, -1));
+        setCurrentGuess((guess) => guess.slice(0, -1));
         return;
       }
 
@@ -40,10 +43,11 @@ function Game() {
         return;
       }
 
-      const isLetter = event.key.match(/^[a-z]{1}$/) != null;
-      if (isLetter) {
-        setCurrentGuess(currentGuess + event.key);
+      if (!/^[a-zA-Z]$/.test(event.key)) {
+        return;
       }
+
+      setCurrentGuess((guess) => guess + event.key.toLowerCase());
     };
 
     window.addEventListener("keydown", handleTyping);
