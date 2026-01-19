@@ -3,3 +3,15 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.message {
+  margin-top: 20px;
+  text-align: center;
+  opacity: 1;
+  height: 24px;
+}
+
+.message.fade-out {
+  opacity: 0;
+  transition: opacity 1s ease;
+}

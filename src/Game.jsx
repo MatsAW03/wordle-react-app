@@ -9,6 +9,38 @@ function Game() {
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
   const [currentGuess, setCurrentGuess] = useState("");
   const [isGameOver, setIsGameOver] = useState(false);
+  const [message, setMessage] = useState("");
+  const [isMessageFading, setIsMessageFading] = useState(false);
+  const fadeTimeOutRef = useRef(null);
+  const clearTimeoutRef = useRef(null);
+
+  const showMessage = (text) => {
+    if (fadeTimeOutRef.current) {
+      clearTimeout(fadeTimeOutRef.current);
+    }
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current);
+    }
+
+    setMessage(text);
+    setIsMessageFading(false);
+
+    fadeTimeOutRef.current = setTimeout(() => {
+      setIsMessageFading(true);
+    }, 1000);
+
+    clearTimeoutRef.current = setTimeout(() => {
+      setMessage("");
+      setIsMessageFading(false);
+    }, 2000);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
+      if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     const handleTyping = (event) => {
@@ -16,12 +48,20 @@ function Game() {
         return;
       }
 
-      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.ctrlKey || event.metaKey || event.altKey) {
+        return;
+      }
 
       if (event.key === "Enter") {
         if (currentGuess.length !== 5) {
           return;
         }
+
+        if (!validWordsRef.current.has(currentGuess)) {
+          showMessage("Hmm… that word isn't recognized😅");
+          return;
+        }
+
         const newGuesses = [...guesses];
         newGuesses[guesses.findIndex((val) => val == null)] = currentGuess;
         setGuesses(newGuesses);
@@ -86,6 +126,9 @@ function Game() {
           />
         );
       })}
+      <div className={`message ${isMessageFading ? "fade-out" : ""}`}>
+        {message}
+      </div>
     </div>
   );
 }
