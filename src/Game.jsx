@@ -58,19 +58,34 @@ function Game() {
         }
 
         if (!validWordsRef.current.has(currentGuess)) {
-          showMessage("Hmm… that word isn't recognized😅");
+          showMessage("Hmm… that word isn't recognized 😅");
+          return;
+        }
+
+        const guessIndex = guesses.findIndex((val) => val == null);
+        if (guessIndex === -1) {
           return;
         }
 
         const newGuesses = [...guesses];
-        newGuesses[guesses.findIndex((val) => val == null)] = currentGuess;
+        newGuesses[guessIndex] = currentGuess;
         setGuesses(newGuesses);
         setCurrentGuess("");
 
         const isCorrect = currentGuess === solution;
         if (isCorrect) {
           setIsGameOver(true);
+          showMessage("You won! 🎉")
+          return;
         }
+
+        const isLastGuess = guessIndex === MAX_GUESSES - 1;
+        if (isLastGuess) {
+          setIsGameOver(true);
+          showMessage(`Out of guesses! 😔 The word was ${solution}`);
+          return;
+        }
+
         return;
       }
 
