@@ -82,7 +82,7 @@ function Game() {
         const isLastGuess = guessIndex === MAX_GUESSES - 1;
         if (isLastGuess) {
           setIsGameOver(true);
-          showMessage(`Out of guesses! 😔 The word was ${solution}`);
+          showMessage(`Out of guesses! 😔 The word was ${solution.toUpperCase()}`);
           return;
         }
 
