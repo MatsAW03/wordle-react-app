@@ -53,7 +53,7 @@ function Game() {
       }
 
       if (event.key === "Enter") {
-        if (currentGuess.length !== 5) {
+        if (currentGuess.length !== WORD_LENGTH) {
           return;
         }
 
@@ -75,14 +75,16 @@ function Game() {
         const isCorrect = currentGuess === solution;
         if (isCorrect) {
           setIsGameOver(true);
-          showMessage("You won! 🎉")
+          showMessage("You won! 🎉");
           return;
         }
 
         const isLastGuess = guessIndex === MAX_GUESSES - 1;
         if (isLastGuess) {
           setIsGameOver(true);
-          showMessage(`Out of guesses! 😔 The word was ${solution.toUpperCase()}`);
+          showMessage(
+            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
+          );
           return;
         }
 
@@ -94,7 +96,7 @@ function Game() {
         return;
       }
 
-      if (currentGuess.length >= 5) {
+      if (currentGuess.length >= WORD_LENGTH) {
         return;
       }
 
