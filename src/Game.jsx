@@ -130,10 +130,12 @@ function Game() {
     fetchWord();
   }, []);
 
+  const activeRowIndex = guesses.findIndex((val) => val == null);
+
   return (
     <div className="game-board">
       {guesses.map((guess, i) => {
-        const isCurrentGuess = i === guesses.findIndex((val) => val == null);
+        const isCurrentGuess = i === activeRowIndex;
         return (
           <Row
             key={i}
