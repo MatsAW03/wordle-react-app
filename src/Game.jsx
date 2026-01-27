@@ -54,7 +54,9 @@ function Game() {
 
       if (event.key === "Enter") {
         if (currentGuess.length !== WORD_LENGTH) {
-          showMessage(`Word must be of length ${WORD_LENGTH}`);
+          if (currentGuess.length > 0) {
+            showMessage(`Word must be of length ${WORD_LENGTH}`);
+          }
           return;
         }
 
