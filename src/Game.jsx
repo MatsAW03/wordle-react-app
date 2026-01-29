@@ -1,6 +1,7 @@
 import "./Game.css";
 import React, { useEffect, useState, useRef } from "react";
 import Row from "./Row";
+import Keyboard from "./Keyboard";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
 
 function Game() {
@@ -151,6 +152,7 @@ function Game() {
       <div className={`message ${isMessageFading ? "fade-out" : ""}`}>
         {message}
       </div>
+      <Keyboard />
     </div>
   );
 }
