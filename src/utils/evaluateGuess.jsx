@@ -21,5 +21,8 @@ export function evaluateGuess(guess, solution) {
       remaining[c]--;
     }
   }
-  return statuses;
+  return guess.split("").map((letter, i) => ({
+    letter,
+    status: statuses[i],
+  }));
 }

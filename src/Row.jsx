@@ -6,16 +6,16 @@ import { evaluateGuess } from "./utils/evaluateGuess";
 function Row({ guess, isFinal, solution }) {
   const tiles = [];
 
-  const statuses = isFinal
+  const evaluated = isFinal
     ? evaluateGuess(guess, solution)
-    : Array(WORD_LENGTH).fill("");
+    : Array(WORD_LENGTH).fill({ letter: "", status: "" });
 
   for (let i = 0; i < WORD_LENGTH; i++) {
     const char = guess[i] ?? "";
     let className = "tile";
 
     if (isFinal) {
-      className += ` ${statuses[i]}`;
+      className += ` ${evaluated[i]?.status ?? ""}`;
     }
 
     tiles.push(
