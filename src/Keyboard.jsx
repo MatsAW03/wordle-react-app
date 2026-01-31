@@ -1,92 +1,101 @@
 import React from "react";
 import "./Keyboard.css";
 
-function Keyboard() {
+function Keyboard({ usedKeys = {} }) {
+  const keyClass = (letter) => {
+    const status = usedKeys[letter.toLowerCase()];
+    return `key ${status ?? ""}`.trim();
+  };
+
   return (
     <div className="keyboard">
       <div className="keyRow">
-        <button className="key" id="keyQ">
+        <button className={keyClass("Q")} id="keyQ">
           Q
         </button>
-        <button className="key" id="keyW">
+        <button className={keyClass("W")} id="keyW">
           W
         </button>
-        <button className="key" id="keyE">
+        <button className={keyClass("E")} id="keyE">
           E
         </button>
-        <button className="key" id="keyR">
+        <button className={keyClass("R")} id="keyR">
           R
         </button>
-        <button className="key" id="keyT">
+        <button className={keyClass("T")} id="keyT">
           T
         </button>
-        <button className="key" id="keyY">
+        <button className={keyClass("Y")} id="keyY">
           Y
         </button>
-        <button className="key" id="keyU">
+        <button className={keyClass("U")} id="keyU">
           U
         </button>
-        <button className="key" id="keyI">
+        <button className={keyClass("I")} id="keyI">
           I
         </button>
-        <button className="key" id="keyO">
+        <button className={keyClass("O")} id="keyO">
           O
         </button>
-        <button className="key" id="keyP">
+        <button className={keyClass("P")} id="keyP">
           P
         </button>
       </div>
+
       <div className="keyRow">
-        <button className="key" id="keyA">
+        <button className={keyClass("A")} id="keyA">
           A
         </button>
-        <button className="key" id="keyS">
+        <button className={keyClass("S")} id="keyS">
           S
         </button>
-        <button className="key" id="keyD">
+        <button className={keyClass("D")} id="keyD">
           D
         </button>
-        <button className="key" id="keyF">
+        <button className={keyClass("F")} id="keyF">
           F
         </button>
-        <button className="key" id="keyG">
+        <button className={keyClass("G")} id="keyG">
           G
         </button>
-        <button className="key" id="keyH">
+        <button className={keyClass("H")} id="keyH">
           H
         </button>
-        <button className="key" id="keyJ">
+        <button className={keyClass("J")} id="keyJ">
           J
         </button>
-        <button className="key" id="keyK">
+        <button className={keyClass("K")} id="keyK">
           K
         </button>
-        <button className="key" id="keyL">
+        <button className={keyClass("L")} id="keyL">
           L
         </button>
       </div>
+
       <div className="keyRow">
-        <button className="key" id="keyZ">
+        <button className={keyClass("Z")} id="keyZ">
           Z
         </button>
-        <button className="key" id="keyX">
+        <button className={keyClass("X")} id="keyX">
           X
         </button>
-        <button className="key" id="keyC">
+        <button className={keyClass("C")} id="keyC">
           C
         </button>
-        <button className="key" id="keyV">
+        <button className={keyClass("V")} id="keyV">
           V
         </button>
-        <button className="key" id="keyB">
+        <button className={keyClass("B")} id="keyB">
           B
         </button>
-        <button className="key" id="keyN">
+        <button className={keyClass("N")} id="keyN">
           N
         </button>
-        <button className="key" id="keyM">
+        <button className={keyClass("M")} id="keyM">
           M
         </button>
+
+        {/* backspace skal ikke farges */}
         <button className="key" id="backspace">
           &larr;
         </button>

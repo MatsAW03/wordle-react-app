@@ -27,3 +27,13 @@
 .keyRow:nth-of-type(3) {
   margin-left: 40px;
 }
+
+.key.correct {
+  background: lightgreen;
+}
+.key.misplaced {
+  background: khaki;
+}
+.key.incorrect {
+  background: lightgray;
+}

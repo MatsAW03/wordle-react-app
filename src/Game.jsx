@@ -1,8 +1,9 @@
 import "./Game.css";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import Row from "./Row";
 import Keyboard from "./Keyboard";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
+import { buildUsedKeys } from "./utils/buildUsedKeys";
 
 function Game() {
   const validWordsRef = useRef(new Set());
@@ -14,6 +15,9 @@ function Game() {
   const [isMessageFading, setIsMessageFading] = useState(false);
   const fadeTimeOutRef = useRef(null);
   const clearTimeoutRef = useRef(null);
+  const usedKeys = useMemo(() => {
+    return buildUsedKeys(guesses, solution);
+  }, [guesses, solution]);
 
   const showMessage = (text) => {
     if (fadeTimeOutRef.current) {
@@ -152,7 +156,7 @@ function Game() {
       <div className={`message ${isMessageFading ? "fade-out" : ""}`}>
         {message}
       </div>
-      <Keyboard />
+      <Keyboard usedKeys={usedKeys} />
     </div>
   );
 }
