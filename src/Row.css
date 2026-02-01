@@ -4,6 +4,7 @@
 }
 
 .tile {
+  background-color: white;
   width: 60px;
   height: 60px;
   border: 1px solid black;
@@ -12,6 +13,7 @@
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .correct {
