@@ -6,9 +6,7 @@ import { evaluateGuess } from "./utils/evaluateGuess";
 function Row({ guess, isFinal, solution }) {
   const tiles = [];
 
-  const evaluated = isFinal
-    ? evaluateGuess(guess, solution)
-    : Array(WORD_LENGTH).fill({ letter: "", status: "" });
+  const evaluated = isFinal ? evaluateGuess(guess, solution) : null;
 
   for (let i = 0; i < WORD_LENGTH; i++) {
     const char = guess[i] ?? "";
