@@ -4,26 +4,25 @@ import { WORD_LENGTH } from "./constants";
 import { evaluateGuess } from "./utils/evaluateGuess";
 
 function Row({ guess, isFinal, solution }) {
-  const tiles = [];
-
   const evaluated = isFinal ? evaluateGuess(guess, solution) : null;
 
-  for (let i = 0; i < WORD_LENGTH; i++) {
-    const char = guess[i] ?? "";
-    let className = "tile";
+  return (
+    <div className="row">
+      {Array(WORD_LENGTH)
+        .fill(null)
+        .map((_, i) => {
+          const char = guess[i] ?? "";
+          const status = isFinal ? (evaluated?.[i]?.status ?? "") : "";
+          const className = `tile ${status}`.trim();
 
-    if (isFinal) {
-      className += ` ${evaluated[i]?.status ?? ""}`;
-    }
-
-    tiles.push(
-      <div key={i} className={className}>
-        {char}
-      </div>,
-    );
-  }
-
-  return <div className="row">{tiles}</div>;
+          return (
+            <div key={i} className={className}>
+              {char}
+            </div>
+          );
+        })}
+    </div>
+  );
 }
 
 export default Row;
