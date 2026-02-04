@@ -15,6 +15,7 @@ function Game() {
   const [isMessageFading, setIsMessageFading] = useState(false);
   const fadeTimeOutRef = useRef(null);
   const clearTimeoutRef = useRef(null);
+  const wordListRef = useRef(null);
   const usedKeys = useMemo(() => {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
@@ -58,6 +59,7 @@ function Game() {
       }
 
       if (event.key === "Enter") {
+        event.preventDefault();
         if (currentGuess.length !== WORD_LENGTH) {
           if (currentGuess.length > 0) {
             showMessage(`Word must be of length ${WORD_LENGTH}`);
@@ -125,8 +127,12 @@ function Game() {
       try {
         const response = await fetch("/wordlist.json");
         const words = await response.json();
+        wordListRef.current = words;
 
-        const randomWord = words[Math.floor(Math.random() * words.length)];
+        const randomWord =
+          wordListRef.current[
+            Math.floor(Math.random() * wordListRef.current.length)
+          ];
 
         validWordsRef.current = new Set(words);
         setSolution(randomWord);
@@ -138,10 +144,37 @@ function Game() {
     fetchWord();
   }, []);
 
+  function restartGame() {
+    setGuesses(Array(MAX_GUESSES).fill(null));
+    setCurrentGuess("");
+    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
+    if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
+    fadeTimeOutRef.current = null;
+    clearTimeoutRef.current = null;
+    setMessage("");
+    setIsMessageFading(false);
+    const randomWord =
+      wordListRef.current[
+        Math.floor(Math.random() * wordListRef.current.length)
+      ];
+    setSolution(randomWord);
+    setIsGameOver(false);
+  }
+
   const activeRowIndex = guesses.findIndex((val) => val == null);
 
   return (
     <div className="game-board">
+      <button
+        id="restart-btn"
+        type="button"
+        onClick={(e) => {
+          restartGame();
+          e.currentTarget.blur();
+        }}
+      >
+        Play Again
+      </button>
       {guesses.map((guess, i) => {
         const isCurrentGuess = i === activeRowIndex;
         return (
