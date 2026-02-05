@@ -21,7 +21,7 @@ function Game() {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
 
-  const showMessage = (text) => {
+  function showMessage(text) {
     if (fadeTimeOutRef.current) {
       clearTimeout(fadeTimeOutRef.current);
     }
@@ -40,13 +40,29 @@ function Game() {
       setMessage("");
       setIsMessageFading(false);
     }, 2000);
-  };
+  }
 
   function setRandomSolution() {
     const list = wordListRef.current;
     if (!Array.isArray(list) || list.length === 0) return false;
     setSolution(getRandomWord(list));
     return true;
+  }
+
+  function restartGame() {
+    setGuesses(Array(MAX_GUESSES).fill(null));
+    setCurrentGuess("");
+
+    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
+    if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
+    fadeTimeOutRef.current = null;
+    clearTimeoutRef.current = null;
+
+    setMessage("");
+    setIsMessageFading(false);
+
+    if (!setRandomSolution()) return;
+    setIsGameOver(false);
   }
 
   useEffect(() => {
@@ -147,22 +163,6 @@ function Game() {
 
     fetchWord();
   }, []);
-
-  function restartGame() {
-    setGuesses(Array(MAX_GUESSES).fill(null));
-    setCurrentGuess("");
-
-    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
-    if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
-    fadeTimeOutRef.current = null;
-    clearTimeoutRef.current = null;
-
-    setMessage("");
-    setIsMessageFading(false);
-
-    if (!setRandomSolution()) return;
-    setIsGameOver(false);
-  }
 
   const activeRowIndex = guesses.findIndex((val) => val == null);
 
