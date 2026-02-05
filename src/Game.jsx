@@ -4,6 +4,7 @@ import Row from "./Row";
 import Keyboard from "./Keyboard";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
 import { buildUsedKeys } from "./utils/buildUsedKeys";
+import { getRandomWord } from "./utils/getRandomWord";
 
 function Game() {
   const validWordsRef = useRef(new Set());
@@ -129,13 +130,8 @@ function Game() {
         const words = await response.json();
         wordListRef.current = words;
 
-        const randomWord =
-          wordListRef.current[
-            Math.floor(Math.random() * wordListRef.current.length)
-          ];
-
         validWordsRef.current = new Set(words);
-        setSolution(randomWord);
+        setSolution(getRandomWord(wordListRef.current));
       } catch (error) {
         console.error(error);
       }
@@ -153,11 +149,7 @@ function Game() {
     clearTimeoutRef.current = null;
     setMessage("");
     setIsMessageFading(false);
-    const randomWord =
-      wordListRef.current[
-        Math.floor(Math.random() * wordListRef.current.length)
-      ];
-    setSolution(randomWord);
+    setSolution(getRandomWord(wordListRef.current));
     setIsGameOver(false);
   }
 
