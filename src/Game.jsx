@@ -42,6 +42,13 @@ function Game() {
     }, 2000);
   };
 
+  function setRandomSolution() {
+    const list = wordListRef.current;
+    if (!Array.isArray(list) || list.length === 0) return false;
+    setSolution(getRandomWord(list));
+    return true;
+  }
+
   useEffect(() => {
     return () => {
       if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
@@ -128,10 +135,11 @@ function Game() {
       try {
         const response = await fetch("/wordlist.json");
         const words = await response.json();
-        wordListRef.current = words;
 
+        wordListRef.current = words;
         validWordsRef.current = new Set(words);
-        setSolution(getRandomWord(wordListRef.current));
+
+        setRandomSolution();
       } catch (error) {
         console.error(error);
       }
@@ -143,13 +151,16 @@ function Game() {
   function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess("");
+
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
     fadeTimeOutRef.current = null;
     clearTimeoutRef.current = null;
+
     setMessage("");
     setIsMessageFading(false);
-    setSolution(getRandomWord(wordListRef.current));
+
+    if (!setRandomSolution()) return;
     setIsGameOver(false);
   }
 
