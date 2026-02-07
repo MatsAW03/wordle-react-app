@@ -49,6 +49,44 @@ function Game() {
     return true;
   }
 
+  function submitGuess(guess) {
+    if (guess.length !== WORD_LENGTH) {
+      if (guess.length > 0) {
+        showMessage(`Word must be of length ${WORD_LENGTH}`);
+      }
+      return;
+    }
+
+    if (!validWordsRef.current.has(guess)) {
+      showMessage("Hmm… that word isn't recognized 😅");
+      return;
+    }
+
+    const guessIndex = guesses.findIndex((val) => val == null);
+    if (guessIndex === -1) {
+      return;
+    }
+
+    const newGuesses = [...guesses];
+    newGuesses[guessIndex] = guess;
+    setGuesses(newGuesses);
+    setCurrentGuess("");
+
+    const isCorrect = guess === solution;
+    if (isCorrect) {
+      setIsGameOver(true);
+      showMessage("You won! 🎉");
+      return;
+    }
+
+    const isLastGuess = guessIndex === MAX_GUESSES - 1;
+    if (isLastGuess) {
+      setIsGameOver(true);
+      showMessage(`Out of guesses! 😔 The word was ${solution.toUpperCase()}`);
+      return;
+    }
+  }
+
   function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess("");
@@ -84,44 +122,7 @@ function Game() {
 
       if (event.key === "Enter") {
         event.preventDefault();
-        if (currentGuess.length !== WORD_LENGTH) {
-          if (currentGuess.length > 0) {
-            showMessage(`Word must be of length ${WORD_LENGTH}`);
-          }
-          return;
-        }
-
-        if (!validWordsRef.current.has(currentGuess)) {
-          showMessage("Hmm… that word isn't recognized 😅");
-          return;
-        }
-
-        const guessIndex = guesses.findIndex((val) => val == null);
-        if (guessIndex === -1) {
-          return;
-        }
-
-        const newGuesses = [...guesses];
-        newGuesses[guessIndex] = currentGuess;
-        setGuesses(newGuesses);
-        setCurrentGuess("");
-
-        const isCorrect = currentGuess === solution;
-        if (isCorrect) {
-          setIsGameOver(true);
-          showMessage("You won! 🎉");
-          return;
-        }
-
-        const isLastGuess = guessIndex === MAX_GUESSES - 1;
-        if (isLastGuess) {
-          setIsGameOver(true);
-          showMessage(
-            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
-          );
-          return;
-        }
-
+        submitGuess(currentGuess);
         return;
       }
 
