@@ -1,5 +1,11 @@
 import "./Game.css";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import Row from "./Row";
 import Keyboard from "./Keyboard";
 import { WORD_LENGTH, MAX_GUESSES } from "./constants";
@@ -21,13 +27,9 @@ function Game() {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
 
-  function showMessage(text) {
-    if (fadeTimeOutRef.current) {
-      clearTimeout(fadeTimeOutRef.current);
-    }
-    if (clearTimeoutRef.current) {
-      clearTimeout(clearTimeoutRef.current);
-    }
+  const showMessage = useCallback((text) => {
+    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
+    if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
 
     setMessage(text);
     setIsMessageFading(false);
@@ -40,7 +42,7 @@ function Game() {
       setMessage("");
       setIsMessageFading(false);
     }, 2000);
-  }
+  }, []);
 
   function setRandomSolution() {
     const list = wordListRef.current;
@@ -49,43 +51,47 @@ function Game() {
     return true;
   }
 
-  function submitGuess(guess) {
-    if (guess.length !== WORD_LENGTH) {
-      if (guess.length > 0) {
-        showMessage(`Word must be of length ${WORD_LENGTH}`);
+  const submitGuess = useCallback(
+    (guess) => {
+      if (guess.length !== WORD_LENGTH) {
+        if (guess.length > 0) {
+          showMessage(`Word must be of length ${WORD_LENGTH}`);
+        }
+        return;
       }
-      return;
-    }
 
-    if (!validWordsRef.current.has(guess)) {
-      showMessage("Hmm… that word isn't recognized 😅");
-      return;
-    }
+      if (!validWordsRef.current.has(guess)) {
+        showMessage("Hmm… that word isn't recognized 😅");
+        return;
+      }
 
-    const guessIndex = guesses.findIndex((val) => val == null);
-    if (guessIndex === -1) {
-      return;
-    }
+      setGuesses((prevGuesses) => {
+        const guessIndex = prevGuesses.findIndex((val) => val == null);
+        if (guessIndex === -1) return prevGuesses;
 
-    const newGuesses = [...guesses];
-    newGuesses[guessIndex] = guess;
-    setGuesses(newGuesses);
-    setCurrentGuess("");
+        const newGuesses = [...prevGuesses];
+        newGuesses[guessIndex] = guess;
 
-    const isCorrect = guess === solution;
-    if (isCorrect) {
-      setIsGameOver(true);
-      showMessage("You won! 🎉");
-      return;
-    }
+        const isCorrect = guess === solution;
+        const isLastGuess = guessIndex === MAX_GUESSES - 1;
 
-    const isLastGuess = guessIndex === MAX_GUESSES - 1;
-    if (isLastGuess) {
-      setIsGameOver(true);
-      showMessage(`Out of guesses! 😔 The word was ${solution.toUpperCase()}`);
-      return;
-    }
-  }
+        if (isCorrect) {
+          setIsGameOver(true);
+          showMessage("You won! 🎉");
+        } else if (isLastGuess) {
+          setIsGameOver(true);
+          showMessage(
+            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
+          );
+        }
+
+        return newGuesses;
+      });
+
+      setCurrentGuess("");
+    },
+    [solution, showMessage],
+  );
 
   function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
@@ -145,7 +151,7 @@ function Game() {
     window.addEventListener("keydown", handleTyping);
 
     return () => window.removeEventListener("keydown", handleTyping);
-  }, [currentGuess, isGameOver, solution, guesses]);
+  }, [currentGuess, isGameOver, submitGuess]);
 
   useEffect(() => {
     const fetchWord = async () => {
