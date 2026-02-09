@@ -1,0 +1,16 @@
+.app-header {
+  background-color: floralwhite;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
+
+.title {
+  color: rgba(0, 0, 0, 0.9);
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 32px;
+  letter-spacing: 2px;
+}
