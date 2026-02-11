@@ -8,7 +8,7 @@ function Header({ theme, toggleTheme }) {
     <header className="app-header">
       <div className="container-row">
         <div className="container left">
-          <button className="help-btn">
+          <button type="button" aria-label="Help" className="help-btn">
             <CiCircleQuestion />
           </button>
         </div>
@@ -16,7 +16,12 @@ function Header({ theme, toggleTheme }) {
           <h1 className="title">WORDLE</h1>
         </div>
         <div className="container right">
-          <button className="theme-btn" onClick={toggleTheme}>
+          <button
+            type="button"
+            aria-label="Toggle theme"
+            className="theme-btn"
+            onClick={toggleTheme}
+          >
             {themeIcon}
           </button>
         </div>
