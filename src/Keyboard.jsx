@@ -22,6 +22,8 @@ function Keyboard({ usedKeys = {} }) {
 
             return (
               <button
+                type="button"
+                aria-label={key === "←" ? "Backspace" : undefined}
                 className={`${keyClass(key)} ${specialClass}`.trim()}
                 key={key}
               >
