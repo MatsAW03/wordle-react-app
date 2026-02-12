@@ -11,6 +11,7 @@ const LAYOUT = [
 
 function Keyboard({ usedKeys = {} }) {
   const keyClass = (key) => {
+    if (key === "Enter" || key === "Backspace") return "key";
     const status = usedKeys[key.toLowerCase()];
     return `key ${status ?? ""}`.trim();
   };
