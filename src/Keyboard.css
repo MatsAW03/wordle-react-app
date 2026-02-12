@@ -22,10 +22,6 @@
   border-radius: 10px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
   cursor: pointer;
-
-  -webkit-font-smoothing: antialiased; /* Chrome/Safari */
-  -moz-osx-font-smoothing: grayscale; /* macOS Firefox */
-  text-rendering: geometricPrecision;
 }
 
 .key svg {
