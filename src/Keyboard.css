@@ -13,14 +13,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: var(--keyboard-bg);
+  color: var(--text);
   height: 50px;
   width: 50px;
   font-size: 22px;
   margin: 6px 6px;
-  border: 1px solid black;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+  box-shadow: 2px 2px 4px var(--keyboard-shadow);
   cursor: pointer;
 }
 
@@ -28,7 +29,7 @@
   display: block;
   width: 24px;
   height: 24px;
-  color: rgba(0, 0, 0, 0.9);
+  color: var(--text);
 }
 
 .enter svg {
@@ -48,11 +49,11 @@
 }
 
 .key.correct {
-  background: lightgreen;
+  background: var(--correct);
 }
 .key.misplaced {
-  background: khaki;
+  background: var(--misplaced);
 }
 .key.incorrect {
-  background: lightgray;
+  background: var(--incorrect);
 }

@@ -4,26 +4,27 @@
 }
 
 .tile {
-  background-color: white;
+  background-color: var(--tile-bg);
   width: 60px;
   height: 60px;
-  border: 1px solid black;
+  border: 1px solid var(--border);
   font-size: 24px;
   display: flex;
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 4px var(--tile-shadow);
+  color: var(--text);
 }
 
 .correct {
-  background-color: lightgreen;
+  background-color: var(--correct);
 }
 
 .misplaced {
-  background-color: khaki;
+  background-color: var(--misplaced);
 }
 
 .incorrect {
-  background-color: lightgray;
+  background-color: var(--incorrect);
 }

@@ -20,13 +20,14 @@
 }
 
 #restart-btn {
-  background-color: white;
+  background-color: var(--playbtn-bg);
   height: 50px;
   width: 100px;
   font-size: 16px;
   margin-bottom: 16px;
-  border: 1px solid black;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 2px 2px 4px var(--tile-shadow);
+  color: var(--text);
   cursor: pointer;
 }
