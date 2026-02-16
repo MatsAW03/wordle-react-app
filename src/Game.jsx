@@ -156,12 +156,21 @@ function Game() {
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        const response = await fetch("/wordlist.json");
-        const words = await response.json();
+        const cached = localStorage.getItem("wordlist_v1");
+        let words;
+
+        if (cached) {
+          words = JSON.parse(cached);
+        } else {
+          const response = await fetch("/wordlist.json");
+          if (!response.ok)
+            throw new Error(`Failed to fetch wordlist: ${response.status}`);
+          words = await response.json();
+          localStorage.setItem("wordlist_v1", JSON.stringify(words));
+        }
 
         wordListRef.current = words;
         validWordsRef.current = new Set(words);
-
         setRandomSolution();
       } catch (error) {
         console.error(error);
