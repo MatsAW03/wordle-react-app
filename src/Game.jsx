@@ -161,10 +161,17 @@ function Game() {
 
         if (cached) {
           words = JSON.parse(cached);
-        } else {
+          if (!Array.isArray(words) || words.length === 0) {
+            localStorage.removeItem("wordlist_v1");
+            words = null;
+          }
+        }
+
+        if (!words) {
           const response = await fetch("/wordlist.json");
-          if (!response.ok)
+          if (!response.ok) {
             throw new Error(`Failed to fetch wordlist: ${response.status}`);
+          }
           words = await response.json();
           localStorage.setItem("wordlist_v1", JSON.stringify(words));
         }
