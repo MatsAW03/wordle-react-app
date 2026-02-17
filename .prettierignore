@@ -1,5 +1,5 @@
 node_modules
 dist
 .vite
-vite.config.js
-public/wordlist.json
+coverage
+package-lock.json
