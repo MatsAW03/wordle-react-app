@@ -1,25 +1,25 @@
-import "./App.css";
-import Game from "./Game";
-import Header from "./Header";
-import { useEffect, useState } from "react";
+import './App.css';
+import Game from './Game';
+import Header from './Header';
+import { useEffect, useState } from 'react';
 
 function App() {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    if (saved === "light" || saved === "dark") return saved;
+    const saved = localStorage.getItem('theme');
+    if (saved === 'light' || saved === 'dark') return saved;
 
-    return window.matchMedia?.("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
   });
 
   function toggleTheme() {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
+    setTheme((t) => (t === 'light' ? 'dark' : 'light'));
   }
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    localStorage.setItem("theme", theme);
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   return (

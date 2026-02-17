@@ -1,24 +1,24 @@
-import "./Game.css";
+import './Game.css';
 import React, {
   useEffect,
   useState,
   useRef,
   useMemo,
   useCallback,
-} from "react";
-import Row from "./Row";
-import Keyboard from "./Keyboard";
-import { WORD_LENGTH, MAX_GUESSES } from "./constants";
-import { buildUsedKeys } from "./utils/buildUsedKeys";
-import { getRandomWord } from "./utils/getRandomWord";
+} from 'react';
+import Row from './Row';
+import Keyboard from './Keyboard';
+import { WORD_LENGTH, MAX_GUESSES } from './constants';
+import { buildUsedKeys } from './utils/buildUsedKeys';
+import { getRandomWord } from './utils/getRandomWord';
 
 function Game() {
   const validWordsRef = useRef(new Set());
-  const [solution, setSolution] = useState("hello");
+  const [solution, setSolution] = useState('hello');
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
-  const [currentGuess, setCurrentGuess] = useState("");
+  const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const [isMessageFading, setIsMessageFading] = useState(false);
   const fadeTimeOutRef = useRef(null);
   const clearTimeoutRef = useRef(null);
@@ -39,7 +39,7 @@ function Game() {
     }, 1000);
 
     clearTimeoutRef.current = setTimeout(() => {
-      setMessage("");
+      setMessage('');
       setIsMessageFading(false);
     }, 2000);
   }, []);
@@ -77,7 +77,7 @@ function Game() {
 
         if (isCorrect) {
           setIsGameOver(true);
-          showMessage("You won! 🎉");
+          showMessage('You won! 🎉');
         } else if (isLastGuess) {
           setIsGameOver(true);
           showMessage(
@@ -88,21 +88,21 @@ function Game() {
         return newGuesses;
       });
 
-      setCurrentGuess("");
+      setCurrentGuess('');
     },
     [solution, showMessage],
   );
 
   function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
-    setCurrentGuess("");
+    setCurrentGuess('');
 
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
     fadeTimeOutRef.current = null;
     clearTimeoutRef.current = null;
 
-    setMessage("");
+    setMessage('');
     setIsMessageFading(false);
 
     if (!setRandomSolution()) return;
@@ -126,13 +126,13 @@ function Game() {
         return;
       }
 
-      if (event.key === "Enter") {
+      if (event.key === 'Enter') {
         event.preventDefault();
         submitGuess(currentGuess);
         return;
       }
 
-      if (event.key === "Backspace") {
+      if (event.key === 'Backspace') {
         setCurrentGuess((guess) => guess.slice(0, -1));
         return;
       }
@@ -148,32 +148,32 @@ function Game() {
       setCurrentGuess((guess) => guess + event.key.toLowerCase());
     };
 
-    window.addEventListener("keydown", handleTyping);
+    window.addEventListener('keydown', handleTyping);
 
-    return () => window.removeEventListener("keydown", handleTyping);
+    return () => window.removeEventListener('keydown', handleTyping);
   }, [currentGuess, isGameOver, submitGuess]);
 
   useEffect(() => {
     const fetchWord = async () => {
       try {
-        const cached = localStorage.getItem("wordlist_v1");
+        const cached = localStorage.getItem('wordlist_v1');
         let words;
 
         if (cached) {
           words = JSON.parse(cached);
           if (!Array.isArray(words) || words.length === 0) {
-            localStorage.removeItem("wordlist_v1");
+            localStorage.removeItem('wordlist_v1');
             words = null;
           }
         }
 
         if (!words) {
-          const response = await fetch("/wordlist.json");
+          const response = await fetch('/wordlist.json');
           if (!response.ok) {
             throw new Error(`Failed to fetch wordlist: ${response.status}`);
           }
           words = await response.json();
-          localStorage.setItem("wordlist_v1", JSON.stringify(words));
+          localStorage.setItem('wordlist_v1', JSON.stringify(words));
         }
 
         wordListRef.current = words;
@@ -206,13 +206,13 @@ function Game() {
         return (
           <Row
             key={i}
-            guess={isCurrentGuess ? currentGuess : (guess ?? "")}
+            guess={isCurrentGuess ? currentGuess : (guess ?? '')}
             isFinal={!isCurrentGuess && guess != null}
             solution={solution}
           />
         );
       })}
-      <div className={`message ${isMessageFading ? "fade-out" : ""}`}>
+      <div className={`message ${isMessageFading ? 'fade-out' : ''}`}>
         {message}
       </div>
       <Keyboard usedKeys={usedKeys} />

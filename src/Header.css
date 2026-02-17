@@ -54,7 +54,7 @@
 
 .title {
   color: var(--text);
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
   font-size: 32px;
   font-weight: normal;
   letter-spacing: 2px;

@@ -1,4 +1,4 @@
-import { evaluateGuess } from "./evaluateGuess";
+import { evaluateGuess } from './evaluateGuess';
 
 export function buildUsedKeys(guesses, solution) {
   const priority = { incorrect: 0, misplaced: 1, correct: 2 };
