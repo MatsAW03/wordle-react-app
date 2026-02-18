@@ -93,12 +93,16 @@ Open the URL Vite prints in your terminal (usually a localhost address).
 
 ### Useful scripts
 
-| Script            | What it does                     |
-| ----------------- | -------------------------------- |
-| `npm run dev`     | Start dev server (HMR)           |
-| `npm run build`   | Build production bundle          |
-| `npm run preview` | Preview production build locally |
-| `npm run lint`    | Run ESLint                       |
+| Script                 | What it does                        |
+| ---------------------- | ----------------------------------- |
+| `npm run dev`          | Start dev server (HMR)              |
+| `npm run build`        | Build production bundle             |
+| `npm run preview`      | Preview production build locally    |
+| `npm run lint`         | Run ESLint                          |
+| `npm run lint:fix`     | Run ESLint and auto-fix issues      |
+| `npm run lint`         | Run ESLint                          |
+| `npm run format`       | Format files with Prettier (writes) |
+| `npm run format:check` | Check formatting with Prettier      |
 
 ---
 
