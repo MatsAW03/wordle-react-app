@@ -63,6 +63,20 @@ wordle-react-clone/
 
 ---
 
+## Continuous Integration (CI)
+
+This project uses **GitHub Actions** to run automated checks on every push to feature branches and on pull requests before merging into `main`.
+
+**Pipeline jobs:**
+
+- **Lint:** ESLint
+- **Format:** Prettier check
+- **Build:** Vite production build
+
+Only changes that pass all checks are merged into `main` (squash merge).
+
+---
+
 ## Key Features
 
 - Random solution each round from `public/wordlist.json`
