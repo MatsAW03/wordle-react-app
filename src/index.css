@@ -14,6 +14,15 @@
   --correct: #81ec81;
   --misplaced: #ece06f;
   --incorrect: #d3d3d3;
+
+  --modal-bg: #ffffff;
+  --modal-backdrop: rgba(0, 0, 0, 0.3);
+  --modal-text: rgba(8, 6, 4, 0.9);
+  --correct-example: #2a9d5b;
+  --misplaced-example: #d6a100;
+  --incorrect-example: #696969;
+  --example-border: rgba(255, 255, 255, 0.6);
+  --example-letter-color: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -29,9 +38,18 @@
   --keyboard-bg: #6b5749;
   --keyboard-shadow: rgba(0, 0, 0, 0.5);
 
-  --correct: #0c991f;
-  --misplaced: #da9707;
+  --correct: #2a9d5b;
+  --misplaced: #d6a100;
   --incorrect: #332920;
+
+  --modal-bg: #ffffff;
+  --modal-backdrop: rgba(0, 0, 0, 0.3);
+  --modal-text: rgba(8, 6, 4, 0.9);
+  --correct-example: #2a9d5b;
+  --misplaced-example: #d6a100;
+  --incorrect-example: #696969;
+  --example-border: rgba(255, 255, 255, 0.6);
+  --example-letter-color: #ffffff;
 }
 
 * {
