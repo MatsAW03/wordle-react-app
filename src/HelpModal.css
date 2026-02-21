@@ -1,0 +1,88 @@
+.helpBackdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  background: var(--modal-backdrop);
+}
+
+.helpModal {
+  position: relative;
+  background: var(--modal-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  max-height: 80vh;
+  width: min(92vw, 520px);
+  overflow: hidden;
+  padding: 24px;
+}
+
+.close-btn {
+  background: transparent;
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+  border-radius: 4px;
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.helpBody {
+  padding-right: 22px;
+  overflow: auto;
+  line-height: 1.4;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--modal-text);
+}
+
+.helpLegend {
+  display: grid;
+  gap: 14px;
+  margin: 12px 0 16px 0;
+}
+
+.helpLegendRow {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  align-items: center;
+  column-gap: 14px;
+}
+
+.helpTile {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+
+  border: 2px solid var(--example-border);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.helpTile--green {
+  background: var(--correct-example);
+  color: var(--example-letter-color);
+}
+
+.helpTile--yellow {
+  background: var(--misplaced-example);
+  color: var(--example-letter-color);
+}
+
+.helpTile--gray {
+  background: var(--incorrect-example);
+  color: var(--example-letter-color);
+}
+
+.action-example {
+  font-style: italic;
+}

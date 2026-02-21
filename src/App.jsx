@@ -1,6 +1,7 @@
 import './App.css';
 import Game from './Game';
 import Header from './Header';
+import HelpModal from './HelpModal';
 import { useEffect, useState } from 'react';
 
 function App() {
@@ -12,6 +13,10 @@ function App() {
       ? 'dark'
       : 'light';
   });
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+
+  const openHelp = () => setIsHelpOpen(true);
+  const closeHelp = () => setIsHelpOpen(false);
 
   function toggleTheme() {
     setTheme((t) => (t === 'light' ? 'dark' : 'light'));
@@ -24,8 +29,16 @@ function App() {
 
   return (
     <div className="app">
-      <Header theme={theme} toggleTheme={toggleTheme} />
-      <Game />
+      <Header
+        theme={theme}
+        toggleTheme={toggleTheme}
+        isHelpOpen={isHelpOpen}
+        openHelp={openHelp}
+        closeHelp={closeHelp}
+      />
+      <Game isHelpOpen={isHelpOpen} closeHelp={closeHelp} />
+
+      {isHelpOpen && <HelpModal closeHelp={closeHelp} />}
     </div>
   );
 }

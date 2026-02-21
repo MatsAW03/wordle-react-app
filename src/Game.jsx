@@ -12,9 +12,9 @@ import { WORD_LENGTH, MAX_GUESSES } from './constants';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 import { getRandomWord } from './utils/getRandomWord';
 
-function Game() {
+function Game({ isHelpOpen, closeHelp }) {
   const validWordsRef = useRef(new Set());
-  const [solution, setSolution] = useState('hello');
+  const [solution, setSolution] = useState('');
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
   const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
@@ -118,13 +118,34 @@ function Game() {
 
   useEffect(() => {
     const handleTyping = (event) => {
-      if (isGameOver) {
-        return;
-      }
-
       if (event.ctrlKey || event.metaKey || event.altKey) {
         return;
       }
+
+      const isLetter = /^[a-zA-Z]$/.test(event.key);
+      const isBackspace = event.key === 'Backspace';
+      const isEnter = event.key === 'Enter';
+      const isEscape = event.key === 'Escape';
+
+      if (isHelpOpen) {
+        if (isGameOver) {
+          if (isEscape) closeHelp();
+          return;
+        }
+
+        if (isLetter || isBackspace || isEnter || isEscape) {
+          closeHelp();
+
+          if (isEscape) return;
+
+          if (isEnter) {
+            event.preventDefault();
+            return;
+          }
+        }
+      }
+
+      if (isGameOver) return;
 
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -141,7 +162,7 @@ function Game() {
         return;
       }
 
-      if (!/^[a-zA-Z]$/.test(event.key)) {
+      if (!isLetter) {
         return;
       }
 
@@ -151,7 +172,7 @@ function Game() {
     window.addEventListener('keydown', handleTyping);
 
     return () => window.removeEventListener('keydown', handleTyping);
-  }, [currentGuess, isGameOver, submitGuess]);
+  }, [currentGuess, isGameOver, submitGuess, isHelpOpen, closeHelp]);
 
   useEffect(() => {
     const fetchWord = async () => {
