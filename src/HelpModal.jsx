@@ -10,7 +10,12 @@ function HelpModal({ closeHelp }) {
         if (e.target === e.currentTarget) closeHelp();
       }}
     >
-      <div className="helpModal">
+      <div
+        className="helpModal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Help"
+      >
         <button
           type="button"
           className="close-btn"
