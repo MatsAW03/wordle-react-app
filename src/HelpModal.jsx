@@ -54,7 +54,8 @@ function HelpModal({ closeHelp }) {
 
             <p>
               Each guess must be a valid word. Use{' '}
-              <span className="action-example">Backspace</span>
+              <span className="action-example">Backspace</span> to delete a
+              letter.
             </p>
             <p>
               Press <span className="action-example">Play Again</span> to get a
