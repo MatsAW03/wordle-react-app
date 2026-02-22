@@ -114,7 +114,6 @@ Open the URL Vite prints in your terminal (usually a localhost address).
 | `npm run preview`      | Preview production build locally    |
 | `npm run lint`         | Run ESLint                          |
 | `npm run lint:fix`     | Run ESLint and auto-fix issues      |
-| `npm run lint`         | Run ESLint                          |
 | `npm run format`       | Format files with Prettier (writes) |
 | `npm run format:check` | Check formatting with Prettier      |
 
