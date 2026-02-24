@@ -36,7 +36,7 @@ function App() {
         openHelp={openHelp}
         closeHelp={closeHelp}
       />
-      <Game isHelpOpen={isHelpOpen} closeHelp={closeHelp} />
+      <Game isHelpOpen={isHelpOpen} />
 
       {isHelpOpen && <HelpModal closeHelp={closeHelp} />}
     </div>

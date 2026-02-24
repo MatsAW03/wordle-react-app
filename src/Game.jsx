@@ -12,7 +12,7 @@ import { WORD_LENGTH, MAX_GUESSES } from './constants';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 import { getRandomWord } from './utils/getRandomWord';
 
-function Game({ isHelpOpen, closeHelp }) {
+function Game({ isHelpOpen }) {
   const validWordsRef = useRef(new Set());
   const [solution, setSolution] = useState('');
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
@@ -118,33 +118,11 @@ function Game({ isHelpOpen, closeHelp }) {
 
   useEffect(() => {
     const handleTyping = (event) => {
-      if (event.ctrlKey || event.metaKey || event.altKey) {
-        return;
-      }
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
 
       const isLetter = /^[a-zA-Z]$/.test(event.key);
-      const isBackspace = event.key === 'Backspace';
-      const isEnter = event.key === 'Enter';
-      const isEscape = event.key === 'Escape';
 
-      if (isHelpOpen) {
-        if (isGameOver) {
-          if (isEscape) closeHelp();
-          return;
-        }
-
-        if (isLetter || isBackspace || isEnter || isEscape) {
-          closeHelp();
-
-          if (isEscape) return;
-
-          if (isEnter) {
-            event.preventDefault();
-            return;
-          }
-        }
-      }
-
+      if (isHelpOpen) return;
       if (isGameOver) return;
 
       if (event.key === 'Enter') {
@@ -158,13 +136,8 @@ function Game({ isHelpOpen, closeHelp }) {
         return;
       }
 
-      if (currentGuess.length >= WORD_LENGTH) {
-        return;
-      }
-
-      if (!isLetter) {
-        return;
-      }
+      if (currentGuess.length >= WORD_LENGTH) return;
+      if (!isLetter) return;
 
       setCurrentGuess((guess) => guess + event.key.toLowerCase());
     };
@@ -172,7 +145,7 @@ function Game({ isHelpOpen, closeHelp }) {
     window.addEventListener('keydown', handleTyping);
 
     return () => window.removeEventListener('keydown', handleTyping);
-  }, [currentGuess, isGameOver, submitGuess, isHelpOpen, closeHelp]);
+  }, [currentGuess, isGameOver, submitGuess, isHelpOpen]);
 
   useEffect(() => {
     const fetchWord = async () => {
