@@ -1,8 +1,40 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import './HelpModal.css';
 
 function HelpModal({ closeHelp }) {
+  const closeBtnRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+
+  useEffect(() => {
+    previouslyFocusedRef.current = document.activeElement;
+    closeBtnRef.current?.focus();
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeHelp();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        closeBtnRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = prevOverflow;
+
+      previouslyFocusedRef.current?.focus?.();
+    };
+  }, [closeHelp]);
+
   return (
     <div
       className="helpBackdrop"
@@ -17,6 +49,7 @@ function HelpModal({ closeHelp }) {
         aria-label="Help"
       >
         <button
+          ref={closeBtnRef}
           type="button"
           className="close-btn"
           onClick={closeHelp}
