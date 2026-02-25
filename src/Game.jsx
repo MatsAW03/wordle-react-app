@@ -93,6 +93,29 @@ function Game({ isHelpOpen }) {
     [solution, showMessage],
   );
 
+  const handleInput = useCallback(
+    (key) => {
+      if (isHelpOpen || isGameOver || !solution) return;
+
+      if (key === 'Enter') {
+        submitGuess(currentGuess);
+        return;
+      }
+
+      if (key === 'Backspace') {
+        setCurrentGuess((g) => g.slice(0, -1));
+        return;
+      }
+
+      if (/^[A-Z]$/.test(key)) {
+        setCurrentGuess((g) =>
+          g.length >= WORD_LENGTH ? g : g + key.toLowerCase(),
+        );
+      }
+    },
+    [isHelpOpen, isGameOver, submitGuess, currentGuess, solution],
+  );
+
   function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess('');
@@ -120,32 +143,26 @@ function Game({ isHelpOpen }) {
     const handleTyping = (event) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
 
-      const isLetter = /^[a-zA-Z]$/.test(event.key);
-
-      if (isHelpOpen) return;
-      if (isGameOver) return;
-
       if (event.key === 'Enter') {
         event.preventDefault();
-        submitGuess(currentGuess);
+        handleInput('Enter');
         return;
       }
 
       if (event.key === 'Backspace') {
-        setCurrentGuess((guess) => guess.slice(0, -1));
+        handleInput('Backspace');
         return;
       }
 
-      if (currentGuess.length >= WORD_LENGTH) return;
-      if (!isLetter) return;
-
-      setCurrentGuess((guess) => guess + event.key.toLowerCase());
+      if (/^[a-zA-Z]$/.test(event.key)) {
+        handleInput(event.key.toUpperCase());
+      }
     };
 
     window.addEventListener('keydown', handleTyping);
 
     return () => window.removeEventListener('keydown', handleTyping);
-  }, [currentGuess, isGameOver, submitGuess, isHelpOpen]);
+  }, [handleInput]);
 
   useEffect(() => {
     const fetchWord = async () => {
@@ -209,7 +226,7 @@ function Game({ isHelpOpen }) {
       <div className={`message ${isMessageFading ? 'fade-out' : ''}`}>
         {message}
       </div>
-      <Keyboard usedKeys={usedKeys} />
+      <Keyboard usedKeys={usedKeys} onKeyPress={handleInput} />
     </div>
   );
 }
