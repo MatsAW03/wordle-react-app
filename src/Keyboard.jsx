@@ -9,11 +9,18 @@ const LAYOUT = [
   ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
 ];
 
-function Keyboard({ usedKeys = {} }) {
+function Keyboard({ usedKeys = {}, onKeyPress }) {
   const keyClass = (key) => {
     if (key === 'Enter' || key === 'Backspace') return 'key';
     const status = usedKeys[key.toLowerCase()];
     return `key ${status ?? ''}`.trim();
+  };
+
+  const emitKey = (key) => {
+    if (!onKeyPress) return;
+    if (key === 'Enter') return onKeyPress('Enter');
+    if (key === 'Backspace') return onKeyPress('Backspace');
+    return onKeyPress(key);
   };
 
   return (
@@ -30,6 +37,7 @@ function Keyboard({ usedKeys = {} }) {
 
             return (
               <button
+                key={key}
                 type="button"
                 aria-label={
                   key === 'Backspace'
@@ -39,7 +47,7 @@ function Keyboard({ usedKeys = {} }) {
                       : undefined
                 }
                 className={`${keyClass(key)} ${specialClass}`.trim()}
-                key={key}
+                onClick={() => emitKey(key)}
               >
                 {key === 'Enter' ? (
                   <IoSend />
