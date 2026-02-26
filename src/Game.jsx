@@ -10,19 +10,24 @@ import Row from './Row';
 import Keyboard from './Keyboard';
 import { WORD_LENGTH, MAX_GUESSES } from './constants';
 import { buildUsedKeys } from './utils/buildUsedKeys';
-import { getRandomWord } from './utils/getRandomWord';
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://http-nodejs-production-02f4.up.railway.app';
 
 function Game({ isHelpOpen }) {
-  const validWordsRef = useRef(new Set());
   const [solution, setSolution] = useState('');
   const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
   const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
   const [message, setMessage] = useState('');
   const [isMessageFading, setIsMessageFading] = useState(false);
+
+  const validWordsRef = useRef(new Set());
   const fadeTimeOutRef = useRef(null);
   const clearTimeoutRef = useRef(null);
   const wordListRef = useRef(null);
+
   const usedKeys = useMemo(() => {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
@@ -44,12 +49,12 @@ function Game({ isHelpOpen }) {
     }, 2000);
   }, []);
 
-  function setRandomSolution() {
-    const list = wordListRef.current;
-    if (!Array.isArray(list) || list.length === 0) return false;
-    setSolution(getRandomWord(list));
-    return true;
-  }
+  const setRandomSolution = useCallback(async () => {
+    const res = await fetch(`${API_BASE}/words/random`);
+    if (!res.ok) throw new Error(`Failed to fetch random word: ${res.status}`);
+    const data = await res.json();
+    setSolution(data.word);
+  }, []);
 
   const submitGuess = useCallback(
     (guess) => {
@@ -116,7 +121,7 @@ function Game({ isHelpOpen }) {
     [isHelpOpen, isGameOver, submitGuess, currentGuess, solution],
   );
 
-  function restartGame() {
+  async function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess('');
 
@@ -128,8 +133,13 @@ function Game({ isHelpOpen }) {
     setMessage('');
     setIsMessageFading(false);
 
-    if (!setRandomSolution()) return;
-    setIsGameOver(false);
+    try {
+      await setRandomSolution();
+      setIsGameOver(false);
+    } catch (e) {
+      console.error(e);
+      showMessage('Could not load a new word. Try again.');
+    }
   }
 
   useEffect(() => {
@@ -189,14 +199,14 @@ function Game({ isHelpOpen }) {
 
         wordListRef.current = words;
         validWordsRef.current = new Set(words);
-        setRandomSolution();
+        await setRandomSolution();
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchWord();
-  }, []);
+  }, [setRandomSolution]);
 
   const activeRowIndex = guesses.findIndex((val) => val == null);
 
