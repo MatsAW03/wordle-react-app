@@ -23,10 +23,8 @@ function Game({ isHelpOpen }) {
   const [message, setMessage] = useState('');
   const [isMessageFading, setIsMessageFading] = useState(false);
 
-  const validWordsRef = useRef(new Set());
   const fadeTimeOutRef = useRef(null);
   const clearTimeoutRef = useRef(null);
-  const wordListRef = useRef(null);
 
   const usedKeys = useMemo(() => {
     return buildUsedKeys(guesses, solution);
@@ -57,7 +55,7 @@ function Game({ isHelpOpen }) {
   }, []);
 
   const submitGuess = useCallback(
-    (guess) => {
+    async (guess) => {
       if (guess.length !== WORD_LENGTH) {
         if (guess.length > 0) {
           showMessage(`Word must be of length ${WORD_LENGTH}`);
@@ -65,8 +63,30 @@ function Game({ isHelpOpen }) {
         return;
       }
 
-      if (!validWordsRef.current.has(guess)) {
-        showMessage("Hmm… that word isn't recognized 😅");
+      try {
+        const res = await fetch(`${API_BASE}/words/validate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ word: guess }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`Word validation failed: ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        if (!data.valid) {
+          if (data.reason === 'length') {
+            showMessage(`Word must be of length ${WORD_LENGTH}`);
+          } else {
+            showMessage(`Word not recognized`);
+          }
+          return;
+        }
+      } catch (e) {
+        console.error(e);
+        showMessage('Word validation service unavailable. Try again');
         return;
       }
 
@@ -175,38 +195,17 @@ function Game({ isHelpOpen }) {
   }, [handleInput]);
 
   useEffect(() => {
-    const fetchWord = async () => {
+    const init = async () => {
       try {
-        const cached = localStorage.getItem('wordlist_v1');
-        let words;
-
-        if (cached) {
-          words = JSON.parse(cached);
-          if (!Array.isArray(words) || words.length === 0) {
-            localStorage.removeItem('wordlist_v1');
-            words = null;
-          }
-        }
-
-        if (!words) {
-          const response = await fetch('/wordlist.json');
-          if (!response.ok) {
-            throw new Error(`Failed to fetch wordlist: ${response.status}`);
-          }
-          words = await response.json();
-          localStorage.setItem('wordlist_v1', JSON.stringify(words));
-        }
-
-        wordListRef.current = words;
-        validWordsRef.current = new Set(words);
         await setRandomSolution();
-      } catch (error) {
-        console.error(error);
+      } catch (e) {
+        console.error(e);
+        showMessage('Could not load a word. Try again.');
       }
     };
 
-    fetchWord();
-  }, [setRandomSolution]);
+    init();
+  }, [setRandomSolution, showMessage]);
 
   const activeRowIndex = guesses.findIndex((val) => val == null);
 
