@@ -4,8 +4,10 @@ import Header from './Header';
 import HelpModal from './HelpModal';
 import { useEffect, useState } from 'react';
 
+type Theme = 'light' | 'dark';
+
 function App() {
-  const [theme, setTheme] = useState(() => {
+  const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme');
     if (saved === 'light' || saved === 'dark') return saved;
 
