@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'node:fs';
 import path from 'node:path';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 
@@ -12,7 +13,28 @@ const WORDLIST_PATH = path.join(process.cwd(), 'data', 'wordlist.json');
 const words = JSON.parse(fs.readFileSync(WORDLIST_PATH, 'utf-8'));
 const wordSet = new Set(words);
 
-app.get('/health', (_req, res) => {
+const healthLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+});
+
+const randomLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+});
+
+const validateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 60,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+});
+
+app.get('/health', healthLimiter, (_req, res) => {
   res.json({
     status: 'ok',
     service: 'wordle-api',
@@ -20,12 +42,12 @@ app.get('/health', (_req, res) => {
   });
 });
 
-app.get('/words/random', (_req, res) => {
+app.get('/words/random', randomLimiter, (_req, res) => {
   const word = words[Math.floor(Math.random() * words.length)];
   res.json({ word });
 });
 
-app.post('/words/validate', (req, res) => {
+app.post('/words/validate', validateLimiter, (req, res) => {
   const word = String(req.body?.word || '').toLowerCase();
 
   if (!/^[a-z]{5}$/.test(word)) {
