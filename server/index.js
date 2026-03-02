@@ -6,7 +6,7 @@ import path from 'node:path';
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1kb' }));
 
 const WORDLIST_PATH = path.join(process.cwd(), 'data', 'wordlist.json');
 const words = JSON.parse(fs.readFileSync(WORDLIST_PATH, 'utf-8'));
@@ -28,8 +28,8 @@ app.get('/words/random', (_req, res) => {
 app.post('/words/validate', (req, res) => {
   const word = String(req.body?.word || '').toLowerCase();
 
-  if (word.length !== 5) {
-    return res.json({ valid: false, reason: 'length' });
+  if (!/^[a-z]{5}$/.test(word)) {
+    return res.json({ valid: false, reason: 'format' });
   }
 
   if (!wordSet.has(word)) {
