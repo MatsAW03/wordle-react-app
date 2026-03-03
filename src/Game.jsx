@@ -10,10 +10,7 @@ import Row from './Row';
 import Keyboard from './Keyboard';
 import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
-
-const API_BASE =
-  import.meta.env.VITE_API_BASE_URL ||
-  'https://http-nodejs-production-02f4.up.railway.app';
+import { API_BASE } from './constants/api';
 
 function Game({ isHelpOpen }) {
   const [solution, setSolution] = useState('');
