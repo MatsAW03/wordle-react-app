@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import Row from './Row';
 import Keyboard from './Keyboard';
-import { WORD_LENGTH, MAX_GUESSES } from './constants/Game';
+import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 
 const API_BASE =
