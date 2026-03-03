@@ -1,6 +1,6 @@
 import './Row.css';
 import React from 'react';
-import { WORD_LENGTH } from './constants';
+import { WORD_LENGTH } from './constants/Game';
 import { evaluateGuess } from './utils/evaluateGuess';
 
 function Row({ guess, isFinal, solution }) {
