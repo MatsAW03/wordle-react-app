@@ -4,3 +4,5 @@ export type EvaluatedLetter = {
   letter: string;
   status: LetterStatus;
 };
+
+export type UsedKeys = Record<string, LetterStatus>;
