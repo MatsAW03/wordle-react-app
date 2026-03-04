@@ -1,8 +1,22 @@
 import './Header.css';
-import { CiCircleQuestion, CiCircleRemove } from 'react-icons/ci';
-import { CiLight, CiDark } from 'react-icons/ci';
+import { CiCircleQuestion, CiLight, CiDark } from 'react-icons/ci';
+import type { Theme } from './types/ui';
 
-function Header({ theme, toggleTheme, isHelpOpen, openHelp, closeHelp }) {
+type HeaderProps = {
+  theme: Theme;
+  toggleTheme: () => void;
+  isHelpOpen: boolean;
+  openHelp: () => void;
+  closeHelp: () => void;
+};
+
+function Header({
+  theme,
+  toggleTheme,
+  isHelpOpen,
+  openHelp,
+  closeHelp,
+}: HeaderProps) {
   const themeIcon = theme === 'light' ? <CiLight /> : <CiDark />;
   return (
     <header className="app-header">
