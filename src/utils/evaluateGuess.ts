@@ -1,6 +1,9 @@
-import { LetterStatus } from '../types/game';
+import type { LetterStatus, EvaluatedLetter } from '../types/game';
 
-export function evaluateGuess(guess: string, solution: string) {
+export function evaluateGuess(
+  guess: string,
+  solution: string,
+): EvaluatedLetter[] {
   const statuses: LetterStatus[] = Array(guess.length).fill('incorrect');
   const remaining: Record<string, number> = {};
 
