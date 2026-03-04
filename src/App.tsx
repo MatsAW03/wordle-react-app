@@ -3,8 +3,7 @@ import Game from './Game';
 import Header from './Header';
 import HelpModal from './HelpModal';
 import { useEffect, useState } from 'react';
-
-type Theme = 'light' | 'dark';
+import type { Theme } from './types/ui';
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
