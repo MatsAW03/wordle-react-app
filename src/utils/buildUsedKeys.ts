@@ -1,4 +1,4 @@
-import { UsedKeys, LetterStatus } from '../types/game';
+import type { UsedKeys, LetterStatus } from '../types/game';
 import { evaluateGuess } from './evaluateGuess';
 
 export function buildUsedKeys(
