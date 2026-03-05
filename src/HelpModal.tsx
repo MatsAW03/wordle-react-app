@@ -1,19 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import './HelpModal.css';
 
-function HelpModal({ closeHelp }) {
-  const closeBtnRef = useRef(null);
-  const previouslyFocusedRef = useRef(null);
+type HelpModalProps = {
+  closeHelp: () => void;
+};
+
+function HelpModal({ closeHelp }: HelpModalProps) {
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    previouslyFocusedRef.current = document.activeElement;
+    const active = document.activeElement;
+    previouslyFocusedRef.current =
+      active instanceof HTMLElement ? active : null;
+
     closeBtnRef.current?.focus();
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    const onKeyDown = (e) => {
+    const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         closeHelp();
         return;
@@ -30,8 +37,7 @@ function HelpModal({ closeHelp }) {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = prevOverflow;
-
-      previouslyFocusedRef.current?.focus?.();
+      previouslyFocusedRef.current?.focus();
     };
   }, [closeHelp]);
 
