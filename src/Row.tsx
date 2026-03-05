@@ -1,9 +1,15 @@
 import './Row.css';
-import React from 'react';
 import { WORD_LENGTH } from './constants/game';
 import { evaluateGuess } from './utils/evaluateGuess';
+import type { LetterStatus } from './types/game';
 
-function Row({ guess, isFinal, solution }) {
+type RowProps = {
+  guess: string;
+  isFinal: boolean;
+  solution: string;
+};
+
+function Row({ guess, isFinal, solution }: RowProps) {
   const evaluated = isFinal ? evaluateGuess(guess, solution) : null;
 
   return (
@@ -12,7 +18,9 @@ function Row({ guess, isFinal, solution }) {
         .fill(null)
         .map((_, i) => {
           const char = guess[i] ?? '';
-          const status = isFinal ? (evaluated?.[i]?.status ?? '') : '';
+          const status: LetterStatus | '' = isFinal
+            ? (evaluated?.[i]?.status ?? '')
+            : '';
           const className = `tile ${status}`.trim();
 
           return (
