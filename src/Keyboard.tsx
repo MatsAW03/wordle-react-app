@@ -1,23 +1,27 @@
-import React from 'react';
 import './Keyboard.css';
 import { IoSend } from 'react-icons/io5';
 import { FaBackspace } from 'react-icons/fa';
+import type { UsedKeys } from './types/game';
 
-const LAYOUT = [
+const LAYOUT: string[][] = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Enter'],
   ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
 ];
 
-function Keyboard({ usedKeys = {}, onKeyPress }) {
-  const keyClass = (key) => {
+type KeyboardProps = {
+  usedKeys?: UsedKeys;
+  onKeyPress: (key: string) => void;
+};
+
+function Keyboard({ usedKeys = {}, onKeyPress }: KeyboardProps) {
+  const keyClass = (key: string) => {
     if (key === 'Enter' || key === 'Backspace') return 'key';
     const status = usedKeys[key.toLowerCase()];
     return `key ${status ?? ''}`.trim();
   };
 
-  const emitKey = (key) => {
-    if (!onKeyPress) return;
+  const emitKey = (key: string) => {
     if (key === 'Enter') return onKeyPress('Enter');
     if (key === 'Backspace') return onKeyPress('Backspace');
     return onKeyPress(key);
