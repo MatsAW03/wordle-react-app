@@ -1,33 +1,33 @@
 import './Game.css';
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react';
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import Row from './Row';
 import Keyboard from './Keyboard';
 import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 import { API_BASE } from './constants/api';
 
-function Game({ isHelpOpen }) {
-  const [solution, setSolution] = useState('');
-  const [guesses, setGuesses] = useState(Array(MAX_GUESSES).fill(null));
-  const [currentGuess, setCurrentGuess] = useState('');
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isMessageFading, setIsMessageFading] = useState(false);
+type GameProps = {
+  isHelpOpen: boolean;
+};
 
-  const fadeTimeOutRef = useRef(null);
-  const clearTimeoutRef = useRef(null);
+function Game({ isHelpOpen }: GameProps) {
+  const [solution, setSolution] = useState<string>('');
+  const [guesses, setGuesses] = useState<Array<string | null>>(
+    Array(MAX_GUESSES).fill(null),
+  );
+  const [currentGuess, setCurrentGuess] = useState<string>('');
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
+  const [isMessageFading, setIsMessageFading] = useState<boolean>(false);
+
+  const fadeTimeOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const usedKeys = useMemo(() => {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
 
-  const showMessage = useCallback((text) => {
+  const showMessage = useCallback((text: string) => {
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
 
@@ -47,12 +47,12 @@ function Game({ isHelpOpen }) {
   const setRandomSolution = useCallback(async () => {
     const res = await fetch(`${API_BASE}/words/random`);
     if (!res.ok) throw new Error(`Failed to fetch random word: ${res.status}`);
-    const data = await res.json();
+    const data: { word: string } = await res.json();
     setSolution(data.word);
   }, []);
 
   const submitGuess = useCallback(
-    async (guess) => {
+    async (guess: string) => {
       if (guess.length !== WORD_LENGTH) {
         if (guess.length > 0) {
           showMessage(`Word must be of length ${WORD_LENGTH}`);
@@ -71,7 +71,7 @@ function Game({ isHelpOpen }) {
           throw new Error(`Word validation failed: ${res.status}`);
         }
 
-        const data = await res.json();
+        const data: { valid: boolean; reason?: string } = await res.json();
 
         if (!data.valid) {
           if (data.reason === 'length') {
@@ -116,7 +116,7 @@ function Game({ isHelpOpen }) {
   );
 
   const handleInput = useCallback(
-    (key) => {
+    (key: string) => {
       if (isHelpOpen || isGameOver || !solution) return;
 
       if (key === 'Enter') {
@@ -167,7 +167,7 @@ function Game({ isHelpOpen }) {
   }, []);
 
   useEffect(() => {
-    const handleTyping = (event) => {
+    const handleTyping = (event: KeyboardEvent) => {
       if (event.ctrlKey || event.metaKey || event.altKey) return;
 
       if (event.key === 'Enter') {
