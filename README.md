@@ -1,6 +1,11 @@
 # Wordle React Clone
 
-A lightweight Wordle-style game built with React + Vite. It picks a random 5-letter solution from a local word list, validates guesses, renders tile feedback (correct / misplaced / incorrect), and colors a QWERTY keyboard based on what you’ve learned so far.
+A Wordle-inspired game built with a **TypeScript + React (Vite)** frontend and a **Node.js/Express REST API** backend deployed on **Railway**.
+
+The backend is the source of truth for:
+
+- selecting a random solution word
+- validating guesses against the word list
 
 ---
 
@@ -20,6 +25,7 @@ Play the official game [here](https://www.nytimes.com/games/wordle/index.html)
 - [Usage](#usage)
 - [API](#api)
 - [Environment Variables](#environment-variables)
+- [Continuous Integration](#continuous-integration)
 - [Contribution Guide](#contribution-guide)
 - [Support & Contact](#support--contact)
 
@@ -27,14 +33,12 @@ Play the official game [here](https://www.nytimes.com/games/wordle/index.html)
 
 ## Introduction
 
-This project is a Wordle-inspired React app created to strengthen my core frontend skills, with a focus on React fundamentals:
+This project started as a frontend-only Wordle clone and was expanded into a small full-stack app to practice:
 
-- **Entry point:** `src/main.jsx` mounts `<App />` with React `StrictMode`.
-- **App shell:** `src/App.jsx` renders the `Game`.
-- **Game logic:** `src/Game.jsx` owns the state (guesses, current input, solution, game over).
-- **Rendering rows:** `src/Row.jsx` renders the 6 rows of tiles and applies evaluated statuses.
-- **Keyboard UI:** `src/Keyboard.jsx` displays the QWERTY layout and colors keys based on results.
-- **Core helpers:** `src/utils/*` contains small pure utilities like guess evaluation and key coloring.
+- **TypeScript** (incremental migration)
+- **REST API design** (request/response contracts)
+- **Node.js / Express** backend development
+- **Railway** deployment and environment-based configuration
 
 <details>
   <summary><strong>Project Structure (click to expand)</strong></summary>
@@ -42,50 +46,50 @@ This project is a Wordle-inspired React app created to strengthen my core fronte
 ```txt
 wordle-react-clone/
 ├─ public/
-│  └─ wordlist.json           # Local dictionary of valid 5-letter words
+│  └─ favicon.png
+├─ server/                      # Node.js/Express API (Railway)
+│  ├─ data/wordlist.json         # Backend dictionary (source of truth)
+│  ├─ index.js                   # Express app + REST endpoints
+│  └─ package.json
 ├─ src/
-│  ├─ main.jsx                # React entry point (creates root)
-│  ├─ App.jsx                 # App shell
-│  ├─ Game.jsx                # Main game state + logic
-│  ├─ Row.jsx                 # Renders a single row of tiles
-│  ├─ Keyboard.jsx            # QWERTY keyboard UI (colored)
-│  ├─ constants.jsx           # WORD_LENGTH, MAX_GUESSES
+│  ├─ main.tsx                   # React entry point
+│  ├─ App.tsx                    # App shell
+│  ├─ Game.tsx                   # Game state + API integration
+│  ├─ Row.tsx                    # Tile row UI
+│  ├─ Keyboard.tsx               # On-screen keyboard UI
+│  ├─ Header.tsx                 # Header + theme toggle
+│  ├─ HelpModal.tsx              # Help modal + focus management
+│  ├─ constants/
+│  │  ├─ game.ts                 # WORD_LENGTH, MAX_GUESSES
+│  │  └─ api.ts                  # API_BASE (with env override)
+│  ├─ types/
+│  │  ├─ game.ts                 # LetterStatus, EvaluatedLetter, UsedKeys
+│  │  └─ ui.ts                   # Theme
 │  ├─ utils/
-│  │  ├─ evaluateGuess.js     # Tile evaluation logic
-│  │  ├─ buildUsedKeys.js     # Key coloring priority
-│  │  └─ getRandomWord.js     # Picks a random word from list
-│  └─ *.css                   # Component styles
-├─ vite.config.js             # Vite + React plugin
-└─ eslint.config.js           # ESLint flat config (React hooks + refresh)
+│  │  ├─ evaluateGuess.ts         # Tile evaluation logic
+│  │  └─ buildUsedKeys.ts         # Key coloring priority
+│  └─ *.css
+├─ eslint.config.js              # ESLint flat config (JS + TS)
+├─ tsconfig.json
+├─ vite.config.js
+└─ package.json
 ```
 
 </details>
 
 ---
 
-## Continuous Integration (CI)
-
-This project uses **GitHub Actions** to run automated checks on every push to feature branches and on pull requests before merging into `main`.
-
-**Pipeline jobs:**
-
-- **Lint:** ESLint
-- **Format:** Prettier check
-- **Build:** Vite production build
-
-Only changes that pass all checks are merged into `main` (squash merge).
-
----
-
 ## Key Features
 
-- Random solution each round from `public/wordlist.json`
-- Guess validation using a `Set` lookup (fast membership checking)
-- Correct Wordle-style evaluation, including duplicate-letter handling (`evaluateGuess`)
+- Random solution each round via backend API
+- Guess validation via backend API
+- Correct Wordle-style evaluation (including duplicate-letter handling)
 - Keyboard coloring that respects priority (correct > misplaced > incorrect)
 - Playable loop (type letters, Backspace, Enter)
 - Fading feedback messages for invalid length / invalid word / win / loss
 - Play Again button to restart and pick a new solution
+- Theme toggle (dark/light) persisted in localStorage
+- Help modal with keyboard support (Esc + focus management)
 
 ---
 
@@ -94,18 +98,47 @@ Only changes that pass all checks are merged into `main` (squash merge).
 ### Prerequisites
 
 - Node.js (LTS recommended)
-- npm (or your preferred package manager)
+- npm
 
-### Install & run
+### 1) Install dependencies (frontend)
 
 ```bash
+npm install
+```
+
+### 2) Run the frontend (Vite)
+
+```bash
+npm run dev
+```
+
+Open the URL Vite prints (usually: http://localhost:5173).
+
+- The frontend calls the hosted Railway API by default (see [Environment Variables](#environment-variables) below)
+
+### 3) Run the backend locally (optional)
+
+If you want to develop/test the API locally:
+
+```bash
+cd server
 npm install
 npm run dev
 ```
 
-Open the URL Vite prints in your terminal (usually a localhost address).
+The API runs on `http://localhost:3001`.
 
-### Useful scripts
+### 4) Point the frontend to the local API (optional)
+
+Create a file in the repo root called `.env.local`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+Then restart the frontend dev server (`npm run dev`) so Vite reloads the env vars.
+
+### Useful scripts (frontend)
 
 | Script                 | What it does                        |
 | ---------------------- | ----------------------------------- |
@@ -116,6 +149,7 @@ Open the URL Vite prints in your terminal (usually a localhost address).
 | `npm run lint:fix`     | Run ESLint and auto-fix issues      |
 | `npm run format`       | Format files with Prettier (writes) |
 | `npm run format:check` | Check formatting with Prettier      |
+| `npm run typecheck`    | TypeScript typecheck (no emit)      |
 
 ---
 
@@ -126,13 +160,12 @@ Open the URL Vite prints in your terminal (usually a localhost address).
 - Type letters on your keyboard to fill the active row.
 - Press <kbd>Enter</kbd> to submit a guess.
 - Press <kbd>Backspace</kbd> to delete the last letter.
+- Click **Play Again** to start a new round with a new random solution.
 
 The game ends when you either:
 
 - guess the word correctly, or
 - use all guesses.
-
-**Note:** The on-screen keyboard is currently visual only (it shows key status colors). Input is handled via real keyboard events.
 
 ### How tile evaluation works (high level)
 
@@ -143,16 +176,16 @@ The game ends when you either:
 <details>
   <summary><strong>Where the main logic lives (click to expand)</strong></summary>
 
-- `src/Game.jsx`
-  - Loads the word list from `public/wordlist.json`
-  - Validates guess length + dictionary membership
+- `src/Game.tsx`
+  - Fetches a random solution from the backend (`GET /words/random`)
+  - Validates guesses via the backend (`POST /words/validate`)
   - Stores guesses and ends the game on win/loss
   - Handles restart and message fade timers
 
-- `src/utils/evaluateGuess.js`
+- `src/utils/evaluateGuess.ts`
   - Produces an array of `{ letter, status }` per guess
 
-- `src/utils/buildUsedKeys.js`
+- `src/utils/buildUsedKeys.ts`
   - Computes keyboard coloring based on all submitted guesses
 
 </details>
@@ -161,37 +194,138 @@ The game ends when you either:
 
 ## API
 
-This project has no backend API.
+The frontend uses a small REST API (Node.js/Express), deployed on Railway (and runnable locally).
 
-### Local static asset
+### Base URL
 
-The only “API-like” dependency is a local fetch to the word list:
+- **Production:** `https://http-nodejs-production-02f4.up.railway.app`
+- **Local:** `http://localhost:3001`
 
-- `GET /wordlist.json`
-  - Served from the `public/` folder by Vite
-  - Returns an array of valid solution/guess words (5 letters)
+The frontend resolves the base URL like this:
 
-### Internal “API” (helpers)
+- If `VITE_API_BASE_URL` is set → use it
+- Otherwise → fall back to the Railway URL (`src/constants/api.ts`)
 
-These are pure utilities used by the React components:
+<details>
+  <summary><strong>Endpoints (click to expand)</strong></summary>
 
-- `evaluateGuess(guess, solution)` → returns tile objects with statuses
-- `buildUsedKeys(guesses, solution)` → returns `{ [letter]: status }`
-- `getRandomWord(wordList)` → picks a random word
+#### `GET /health`
+
+Basic health check.
+
+**Response**
+
+```json
+{
+  "status": "ok",
+  "service": "wordle-api",
+  "time": "2026-03-02T12:34:56.000Z"
+}
+```
+
+#### `GET /words/random`
+
+Returns a random 5-letter solution word.
+
+**Response**
+
+```json
+{ "word": "crane" }
+```
+
+#### `POST /words/validate`
+
+Validates a guessed word.
+
+**Request**
+
+```json
+{ "word": "crane" }
+```
+
+**Responses**
+
+```json
+{ "valid": true }
+```
+
+```json
+{ "valid": false, "reason": "format" }
+```
+
+```json
+{ "valid": false, "reason": "not_found" }
+```
+
+`reason` values:
+
+- `format` → not exactly 5 lowercase letters (`/^[a-z]{5}$/`)
+- `not_found` → not present in the server word list
+
+</details>
+
+### Basic hardening
+
+The API includes:
+
+- JSON body size limit (`1kb`)
+- input validation (`/^[a-z]{5}$/`)
+- per-endpoint rate limiting
+- `trust proxy` enabled (required behind Railway/proxies)
 
 ---
 
 ## Environment Variables
 
-No environment variables are required right now.
+The frontend defaults to the hosted Railway API, but you can override it locally.
+
+### Frontend
+
+- `VITE_API_BASE_URL` (optional)
+
+If set, the frontend uses this base URL for API requests.  
+If not set, it falls back to the Railway URL defined in `src/constants/api.ts`.
+
+#### Local development override (recommended)
+
+Create a file in the repo root called `.env.local`:
+
+```bash
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+Then restart the frontend dev server (`npm run dev`) so Vite reloads the env vars.
+
+### Backend
+
+- `PORT` (provided by Railway)
+  - defaults to `3001` locally
+
+---
+
+## Continuous Integration
+
+This project uses **GitHub Actions** to run automated checks on pushes and on pull requests into `main`.
+
+- Development happens on a temporary `dev` branch and is merged into `main` via PR.
+- `main` is protected: all required CI checks must pass before merging.
+
+**Pipeline jobs:**
+
+- **Lint:** ESLint
+- **Format:** Prettier check
+- **TypeCheck:** TypeScript (`tsc` / `npm run typecheck`)
+- **Build:** Vite production build
+
+Merges into `main` use **squash merge**.
 
 ---
 
 ## Contribution Guide
 
-This project is a personal learning exercise for frontend development and React, so I’m not accepting external contributions right now.
+This project is a personal learning exercise, so I’m not accepting external contributions right now.
 
-If you spot an issue or have suggestions, please refer to **Support & Contact** below.
+If you spot an issue or have suggestions, feel free to open an issue or contact me (see [Support & Contact](#support--contact)).
 
 ---
 
