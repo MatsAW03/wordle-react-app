@@ -10,18 +10,40 @@ type GameProps = {
   isHelpOpen: boolean;
 };
 
+type GameStatus = 'playing' | 'won' | 'lost';
+
+const HIGH_SCORE_STORAGE_KEY = 'wordle-high-score';
+
+function getStoredHighScore(): number {
+  try {
+    const storedValue = window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY);
+    const parsedValue = Number.parseInt(storedValue ?? '0', 10);
+
+    return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : 0;
+  } catch {
+    return 0;
+  }
+}
+
 function Game({ isHelpOpen }: GameProps) {
   const [solution, setSolution] = useState<string>('');
   const [guesses, setGuesses] = useState<Array<string | null>>(
     Array(MAX_GUESSES).fill(null),
   );
   const [currentGuess, setCurrentGuess] = useState<string>('');
-  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
+  const [score, setScore] = useState<number>(0);
+  const [highScore, setHighScore] = useState<number>(() =>
+    getStoredHighScore(),
+  );
+  const [isSubmittingGuess, setIsSubmittingGuess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [isMessageFading, setIsMessageFading] = useState<boolean>(false);
 
   const fadeTimeOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const isGameOver = gameStatus !== 'playing';
 
   const usedKeys = useMemo(() => {
     return buildUsedKeys(guesses, solution);
@@ -53,12 +75,16 @@ function Game({ isHelpOpen }: GameProps) {
 
   const submitGuess = useCallback(
     async (guess: string) => {
+      if (isSubmittingGuess) return;
+
       if (guess.length !== WORD_LENGTH) {
         if (guess.length > 0) {
           showMessage(`Word must be of length ${WORD_LENGTH}`);
         }
         return;
       }
+
+      setIsSubmittingGuess(true);
 
       try {
         const res = await fetch(`${API_BASE}/words/validate`, {
@@ -81,43 +107,60 @@ function Game({ isHelpOpen }: GameProps) {
           }
           return;
         }
+
+        setGuesses((prevGuesses) => {
+          const guessIndex = prevGuesses.findIndex((val) => val == null);
+          if (guessIndex === -1) return prevGuesses;
+
+          const newGuesses = [...prevGuesses];
+          newGuesses[guessIndex] = guess;
+
+          const isCorrect = guess === solution;
+          const isLastGuess = guessIndex === MAX_GUESSES - 1;
+
+          if (isCorrect) {
+            const nextScore = score + 1;
+            setScore(nextScore);
+            setGameStatus('won');
+
+            if (nextScore > highScore) {
+              setHighScore(nextScore);
+
+              try {
+                localStorage.setItem(HIGH_SCORE_STORAGE_KEY, String(nextScore));
+              } catch (e) {
+                console.error(e);
+                showMessage(`An error occured when saving high score`);
+              }
+
+              showMessage('You won! 🎉 New high score!');
+            } else {
+              showMessage('You won! 🎉');
+            }
+          } else if (isLastGuess) {
+            setGameStatus('lost');
+            showMessage(
+              `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
+            );
+          }
+
+          return newGuesses;
+        });
+
+        setCurrentGuess('');
       } catch (e) {
         console.error(e);
         showMessage('Word validation service unavailable. Try again');
-        return;
+      } finally {
+        setIsSubmittingGuess(false);
       }
-
-      setGuesses((prevGuesses) => {
-        const guessIndex = prevGuesses.findIndex((val) => val == null);
-        if (guessIndex === -1) return prevGuesses;
-
-        const newGuesses = [...prevGuesses];
-        newGuesses[guessIndex] = guess;
-
-        const isCorrect = guess === solution;
-        const isLastGuess = guessIndex === MAX_GUESSES - 1;
-
-        if (isCorrect) {
-          setIsGameOver(true);
-          showMessage('You won! 🎉');
-        } else if (isLastGuess) {
-          setIsGameOver(true);
-          showMessage(
-            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
-          );
-        }
-
-        return newGuesses;
-      });
-
-      setCurrentGuess('');
     },
-    [solution, showMessage],
+    [solution, showMessage, score, highScore, isSubmittingGuess],
   );
 
   const handleInput = useCallback(
     (key: string) => {
-      if (isHelpOpen || isGameOver || !solution) return;
+      if (isHelpOpen || isGameOver || !solution || isSubmittingGuess) return;
 
       if (key === 'Enter') {
         submitGuess(currentGuess);
@@ -135,12 +178,23 @@ function Game({ isHelpOpen }: GameProps) {
         );
       }
     },
-    [isHelpOpen, isGameOver, submitGuess, currentGuess, solution],
+    [
+      isHelpOpen,
+      isGameOver,
+      isSubmittingGuess,
+      submitGuess,
+      currentGuess,
+      solution,
+    ],
   );
 
   async function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess('');
+
+    if (gameStatus !== 'won') {
+      setScore(0);
+    }
 
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
@@ -152,7 +206,7 @@ function Game({ isHelpOpen }: GameProps) {
 
     try {
       await setRandomSolution();
-      setIsGameOver(false);
+      setGameStatus('playing');
     } catch (e) {
       console.error(e);
       showMessage('Could not load a new word. Try again.');
@@ -206,18 +260,27 @@ function Game({ isHelpOpen }: GameProps) {
 
   const activeRowIndex = guesses.findIndex((val) => val == null);
 
+  const restartButtonLabel =
+    gameStatus === 'won'
+      ? 'Continue'
+      : gameStatus === 'lost'
+        ? 'Play Again'
+        : 'Restart';
+
   return (
     <div className="game-board">
       <button
         id="restart-btn"
         type="button"
+        disabled={isSubmittingGuess}
         onClick={(e) => {
           restartGame();
           e.currentTarget.blur();
         }}
       >
-        Play Again
+        {restartButtonLabel}
       </button>
+
       {guesses.map((guess, i) => {
         const isCurrentGuess = i === activeRowIndex;
         return (
@@ -229,6 +292,10 @@ function Game({ isHelpOpen }: GameProps) {
           />
         );
       })}
+      <div className="scoreboard">
+        <span>Score: {score}</span>
+        <span>High Score: {highScore}</span>
+      </div>
       <div className={`message ${isMessageFading ? 'fade-out' : ''}`}>
         {message}
       </div>
