@@ -100,7 +100,7 @@ function Game({ isHelpOpen }: GameProps) {
         const data: { valid: boolean; reason?: string } = await res.json();
 
         if (!data.valid) {
-          if (data.reason === 'length') {
+          if (data.reason === 'format') {
             showMessage(`Word must be of length ${WORD_LENGTH}`);
           } else {
             showMessage(`Word not recognized`);
