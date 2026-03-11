@@ -11,7 +11,7 @@ The backend is the source of truth for:
 
 ## Disclaimer
 
-This is an unofficial Wordle-inspired clone made for educational purposes. It is not affiliated with, endorsed by, or connected to Wordle or The New York Times. “Wordle” is a trademark of its respective owner.
+This is an unofficial Wordle-inspired clone made for learning purposes. It is not affiliated with, endorsed by, or connected to Wordle or The New York Times. “Wordle” is a trademark of its respective owner.
 
 Play the official game [here](https://www.nytimes.com/games/wordle/index.html)
 
