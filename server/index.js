@@ -3,6 +3,10 @@ import cors from 'cors';
 import fs from 'node:fs';
 import path from 'node:path';
 import rateLimit from 'express-rate-limit';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -11,7 +15,7 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '1kb' }));
 
-const WORDLIST_PATH = path.join(process.cwd(), 'data', 'wordlist.json');
+const WORDLIST_PATH = path.join(__dirname, 'data', 'wordlist.json');
 const words = JSON.parse(fs.readFileSync(WORDLIST_PATH, 'utf-8'));
 const wordSet = new Set(words);
 
