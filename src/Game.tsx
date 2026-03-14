@@ -12,11 +12,11 @@ type GameProps = {
 
 type GameStatus = 'playing' | 'won' | 'lost';
 
-const HIGH_SCORE_STORAGE_KEY = 'wordle-high-score';
+const BEST_STREAK_STORAGE_KEY = 'wordle-best-streak';
 
-function getStoredHighScore(): number {
+function getStoredBestStreak(): number {
   try {
-    const storedValue = window.localStorage.getItem(HIGH_SCORE_STORAGE_KEY);
+    const storedValue = window.localStorage.getItem(BEST_STREAK_STORAGE_KEY);
     const parsedValue = Number.parseInt(storedValue ?? '0', 10);
 
     return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : 0;
@@ -32,9 +32,9 @@ function Game({ isHelpOpen }: GameProps) {
   );
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
-  const [score, setScore] = useState<number>(0);
-  const [highScore, setHighScore] = useState<number>(() =>
-    getStoredHighScore(),
+  const [streak, setStreak] = useState<number>(0);
+  const [bestStreak, setBestStreak] = useState<number>(() =>
+    getStoredBestStreak(),
   );
   const [isSubmittingGuess, setIsSubmittingGuess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
@@ -103,7 +103,7 @@ function Game({ isHelpOpen }: GameProps) {
           if (data.reason === 'format') {
             showMessage(`Word must be of length ${WORD_LENGTH}`);
           } else {
-            showMessage(`Word not recognized`);
+            showMessage('Word not recognized');
           }
           return;
         }
@@ -119,21 +119,24 @@ function Game({ isHelpOpen }: GameProps) {
           const isLastGuess = guessIndex === MAX_GUESSES - 1;
 
           if (isCorrect) {
-            const nextScore = score + 1;
-            setScore(nextScore);
+            const nextStreak = streak + 1;
+            setStreak(nextStreak);
             setGameStatus('won');
 
-            if (nextScore > highScore) {
-              setHighScore(nextScore);
+            if (nextStreak > bestStreak) {
+              setBestStreak(nextStreak);
 
               try {
-                localStorage.setItem(HIGH_SCORE_STORAGE_KEY, String(nextScore));
+                localStorage.setItem(
+                  BEST_STREAK_STORAGE_KEY,
+                  String(nextStreak),
+                );
               } catch (e) {
                 console.error(e);
-                showMessage(`An error occured when saving high score`);
+                showMessage('An error occured when saving best streak');
               }
 
-              showMessage('You won! 🎉 New high score!');
+              showMessage('You won! 🎉 New best streak!');
             } else {
               showMessage('You won! 🎉');
             }
@@ -155,7 +158,7 @@ function Game({ isHelpOpen }: GameProps) {
         setIsSubmittingGuess(false);
       }
     },
-    [solution, showMessage, score, highScore, isSubmittingGuess],
+    [solution, showMessage, streak, bestStreak, isSubmittingGuess],
   );
 
   const handleInput = useCallback(
@@ -193,7 +196,7 @@ function Game({ isHelpOpen }: GameProps) {
     setCurrentGuess('');
 
     if (gameStatus !== 'won') {
-      setScore(0);
+      setStreak(0);
     }
 
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
@@ -293,8 +296,8 @@ function Game({ isHelpOpen }: GameProps) {
         );
       })}
       <div className="scoreboard">
-        <span>Score: {score}</span>
-        <span>High Score: {highScore}</span>
+        <span>Streak: {streak}</span>
+        <span>Best Streak: {bestStreak}</span>
       </div>
       <div className={`message ${isMessageFading ? 'fade-out' : ''}`}>
         {message}
