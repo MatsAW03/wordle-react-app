@@ -5,6 +5,7 @@ import Keyboard from './Keyboard';
 import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 import { API_BASE } from './constants/api';
+import { getStoredGameStats, saveStoredGameStats } from './utils/gameStats';
 
 type GameProps = {
   isHelpOpen: boolean;
@@ -12,30 +13,18 @@ type GameProps = {
 
 type GameStatus = 'playing' | 'won' | 'lost';
 
-const BEST_STREAK_STORAGE_KEY = 'wordle-best-streak';
-
-function getStoredBestStreak(): number {
-  try {
-    const storedValue = window.localStorage.getItem(BEST_STREAK_STORAGE_KEY);
-    const parsedValue = Number.parseInt(storedValue ?? '0', 10);
-
-    return Number.isFinite(parsedValue) && parsedValue >= 0 ? parsedValue : 0;
-  } catch {
-    return 0;
-  }
-}
-
 function Game({ isHelpOpen }: GameProps) {
   const [solution, setSolution] = useState<string>('');
   const [guesses, setGuesses] = useState<Array<string | null>>(
     Array(MAX_GUESSES).fill(null),
   );
+
+  const initialStats = getStoredGameStats();
+  const [streak, setStreak] = useState<number>(initialStats.currentStreak);
+  const [bestStreak, setBestStreak] = useState<number>(initialStats.bestStreak);
+
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
-  const [streak, setStreak] = useState<number>(0);
-  const [bestStreak, setBestStreak] = useState<number>(() =>
-    getStoredBestStreak(),
-  );
   const [isSubmittingGuess, setIsSubmittingGuess] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
   const [isMessageFading, setIsMessageFading] = useState<boolean>(false);
@@ -120,28 +109,51 @@ function Game({ isHelpOpen }: GameProps) {
 
           if (isCorrect) {
             const nextStreak = streak + 1;
+            const nextBestStreak = Math.max(bestStreak, nextStreak);
+
             setStreak(nextStreak);
+            setBestStreak(nextBestStreak);
             setGameStatus('won');
 
-            if (nextStreak > bestStreak) {
-              setBestStreak(nextStreak);
+            try {
+              const stats = getStoredGameStats();
 
-              try {
-                localStorage.setItem(
-                  BEST_STREAK_STORAGE_KEY,
-                  String(nextStreak),
-                );
-              } catch (e) {
-                console.error(e);
-                showMessage('An error occured when saving best streak');
-              }
+              saveStoredGameStats({
+                ...stats,
+                gamesPlayed: stats.gamesPlayed + 1,
+                wins: stats.wins + 1,
+                currentStreak: nextStreak,
+                bestStreak: nextBestStreak,
+              });
+            } catch (e) {
+              console.error(e);
+              showMessage('An error occurred when saving game stats');
+              return newGuesses;
+            }
 
+            if (nextBestStreak > bestStreak) {
               showMessage('You won! 🎉 New best streak!');
             } else {
               showMessage('You won! 🎉');
             }
           } else if (isLastGuess) {
             setGameStatus('lost');
+            setStreak(0);
+
+            try {
+              const stats = getStoredGameStats();
+
+              saveStoredGameStats({
+                ...stats,
+                gamesPlayed: stats.gamesPlayed + 1,
+                losses: stats.losses + 1,
+                currentStreak: 0,
+              });
+            } catch (e) {
+              console.error(e);
+              showMessage('An error occurred when saving game stats');
+            }
+
             showMessage(
               `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
             );
@@ -194,10 +206,6 @@ function Game({ isHelpOpen }: GameProps) {
   async function restartGame() {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess('');
-
-    if (gameStatus !== 'won') {
-      setStreak(0);
-    }
 
     if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
