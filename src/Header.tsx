@@ -1,6 +1,8 @@
 import './Header.css';
 import { CiCircleQuestion, CiLight, CiDark } from 'react-icons/ci';
+import { IoStatsChartOutline } from 'react-icons/io5';
 import type { Theme } from './types/ui';
+import type { AppView } from './types/app';
 
 type HeaderProps = {
   theme: Theme;
@@ -8,6 +10,9 @@ type HeaderProps = {
   isHelpOpen: boolean;
   openHelp: () => void;
   closeHelp: () => void;
+  activeView: AppView;
+  showGame: () => void;
+  showStats: () => void;
 };
 
 function Header({
@@ -16,6 +21,9 @@ function Header({
   isHelpOpen,
   openHelp,
   closeHelp,
+  activeView,
+  showGame,
+  showStats,
 }: HeaderProps) {
   const themeIcon = theme === 'light' ? <CiLight /> : <CiDark />;
   return (
@@ -29,6 +37,15 @@ function Header({
             onClick={isHelpOpen ? closeHelp : openHelp}
           >
             <CiCircleQuestion />
+          </button>
+
+          <button
+            type="button"
+            aria-label={activeView === 'game' ? 'Show statistics' : 'Show game'}
+            className="stats-btn"
+            onClick={activeView === 'game' ? showStats : showGame}
+          >
+            <IoStatsChartOutline />
           </button>
         </div>
         <div className="container middle">

@@ -2,8 +2,10 @@ import './App.css';
 import Game from './Game';
 import Header from './Header';
 import HelpModal from './HelpModal';
+import Statistics from './Statistics';
 import { useEffect, useState } from 'react';
 import type { Theme } from './types/ui';
+import type { AppView } from './types/app';
 
 function App() {
   const [theme, setTheme] = useState<Theme>(() => {
@@ -15,9 +17,12 @@ function App() {
       : 'light';
   });
   const [isHelpOpen, setIsHelpOpen] = useState(false);
-
+  const [activeView, setActiveView] = useState<AppView>('game');
   const openHelp = () => setIsHelpOpen(true);
   const closeHelp = () => setIsHelpOpen(false);
+
+  const showGame = () => setActiveView('game');
+  const showStats = () => setActiveView('stats');
 
   function toggleTheme() {
     setTheme((t) => (t === 'light' ? 'dark' : 'light'));
@@ -36,8 +41,15 @@ function App() {
         isHelpOpen={isHelpOpen}
         openHelp={openHelp}
         closeHelp={closeHelp}
+        activeView={activeView}
+        showGame={showGame}
+        showStats={showStats}
       />
-      <Game isHelpOpen={isHelpOpen} />
+      {activeView === 'game' ? (
+        <Game isHelpOpen={isHelpOpen} />
+      ) : (
+        <Statistics />
+      )}
 
       {isHelpOpen && <HelpModal closeHelp={closeHelp} />}
     </div>
