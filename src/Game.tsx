@@ -97,70 +97,66 @@ function Game({ isHelpOpen }: GameProps) {
           return;
         }
 
-        setGuesses((prevGuesses) => {
-          const guessIndex = prevGuesses.findIndex((val) => val == null);
-          if (guessIndex === -1) return prevGuesses;
+        const guessIndex = guesses.findIndex((val) => val == null);
+        if (guessIndex === -1) return;
 
-          const newGuesses = [...prevGuesses];
-          newGuesses[guessIndex] = guess;
+        const newGuesses = [...guesses];
+        newGuesses[guessIndex] = guess;
+        setGuesses(newGuesses);
 
-          const isCorrect = guess === solution;
-          const isLastGuess = guessIndex === MAX_GUESSES - 1;
+        const isCorrect = guess === solution;
+        const isLastGuess = guessIndex === MAX_GUESSES - 1;
 
-          if (isCorrect) {
-            const nextStreak = streak + 1;
-            const nextBestStreak = Math.max(bestStreak, nextStreak);
+        if (isCorrect) {
+          const nextStreak = streak + 1;
+          const nextBestStreak = Math.max(bestStreak, nextStreak);
 
-            setStreak(nextStreak);
-            setBestStreak(nextBestStreak);
-            setGameStatus('won');
+          setStreak(nextStreak);
+          setBestStreak(nextBestStreak);
+          setGameStatus('won');
 
-            try {
-              const stats = getStoredGameStats();
+          try {
+            const stats = getStoredGameStats();
 
-              saveStoredGameStats({
-                ...stats,
-                gamesPlayed: stats.gamesPlayed + 1,
-                wins: stats.wins + 1,
-                currentStreak: nextStreak,
-                bestStreak: nextBestStreak,
-              });
-            } catch (e) {
-              console.error(e);
-              showMessage('An error occurred when saving game stats');
-              return newGuesses;
-            }
-
-            if (nextBestStreak > bestStreak) {
-              showMessage('You won! 🎉 New best streak!');
-            } else {
-              showMessage('You won! 🎉');
-            }
-          } else if (isLastGuess) {
-            setGameStatus('lost');
-            setStreak(0);
-
-            try {
-              const stats = getStoredGameStats();
-
-              saveStoredGameStats({
-                ...stats,
-                gamesPlayed: stats.gamesPlayed + 1,
-                losses: stats.losses + 1,
-                currentStreak: 0,
-              });
-            } catch (e) {
-              console.error(e);
-              showMessage('An error occurred when saving game stats');
-            }
-
-            showMessage(
-              `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
-            );
+            saveStoredGameStats({
+              ...stats,
+              gamesPlayed: stats.gamesPlayed + 1,
+              wins: stats.wins + 1,
+              currentStreak: nextStreak,
+              bestStreak: nextBestStreak,
+            });
+          } catch (e) {
+            console.error(e);
+            showMessage('An error occurred when saving game stats');
           }
 
-          return newGuesses;
-        });
+          if (nextBestStreak > bestStreak) {
+            showMessage('You won! 🎉 New best streak!');
+          } else {
+            showMessage('You won! 🎉');
+          }
+        } else if (isLastGuess) {
+          setGameStatus('lost');
+          setStreak(0);
+
+          try {
+            const stats = getStoredGameStats();
+
+            saveStoredGameStats({
+              ...stats,
+              gamesPlayed: stats.gamesPlayed + 1,
+              losses: stats.losses + 1,
+              currentStreak: 0,
+            });
+          } catch (e) {
+            console.error(e);
+            showMessage('An error occurred when saving game stats');
+          }
+
+          showMessage(
+            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
+          );
+        }
 
         setCurrentGuess('');
       } catch (e) {
@@ -170,7 +166,7 @@ function Game({ isHelpOpen }: GameProps) {
         setIsSubmittingGuess(false);
       }
     },
-    [solution, showMessage, streak, bestStreak, isSubmittingGuess],
+    [guesses, solution, showMessage, streak, bestStreak, isSubmittingGuess],
   );
 
   const handleInput = useCallback(
