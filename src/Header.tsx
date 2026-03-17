@@ -25,7 +25,6 @@ function Header({
   showGame,
   showStats,
 }: HeaderProps) {
-  const themeIcon = theme === 'light' ? <CiLight /> : <CiDark />;
   return (
     <header className="app-header">
       <div className="container-row">
@@ -54,11 +53,13 @@ function Header({
         <div className="container right">
           <button
             type="button"
-            aria-label="Toggle theme"
+            aria-label={
+              theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'
+            }
             className="theme-btn"
             onClick={toggleTheme}
           >
-            {themeIcon}
+            {theme === 'light' ? <CiDark /> : <CiLight />}
           </button>
         </div>
       </div>
