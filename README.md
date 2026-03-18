@@ -140,16 +140,20 @@ Then restart the frontend dev server (`npm run dev`) so Vite reloads the env var
 
 ### Useful scripts (frontend)
 
-| Script                 | What it does                        |
-| ---------------------- | ----------------------------------- |
-| `npm run dev`          | Start dev server (HMR)              |
-| `npm run build`        | Build production bundle             |
-| `npm run preview`      | Preview production build locally    |
-| `npm run lint`         | Run ESLint                          |
-| `npm run lint:fix`     | Run ESLint and auto-fix issues      |
-| `npm run format`       | Format files with Prettier (writes) |
-| `npm run format:check` | Check formatting with Prettier      |
-| `npm run typecheck`    | TypeScript typecheck (no emit)      |
+| Script                 | What it does                              |
+| ---------------------- | ----------------------------------------- |
+| `npm run dev`          | Start dev server (HMR)                    |
+| `npm run build`        | Build production bundle                   |
+| `npm run preview`      | Preview production build locally          |
+| `npm run lint`         | Run ESLint                                |
+| `npm run lint:fix`     | Run ESLint and auto-fix issues            |
+| `npm run format`       | Format files with Prettier (writes)       |
+| `npm run format:check` | Check formatting with Prettier            |
+| `npm run typecheck`    | TypeScript typecheck (no emit)            |
+| `npm test`             | Run Vitest once                           |
+| `npm run test:watch`   | Run Vitest in watch mode                  |
+| `npm run docker:build` | Build the frontend Docker image           |
+| `npm run docker:run`   | Run the frontend Docker container locally |
 
 ---
 
