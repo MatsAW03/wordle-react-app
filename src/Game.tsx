@@ -13,6 +13,27 @@ type GameProps = {
 
 type GameStatus = 'playing' | 'won' | 'lost';
 
+type GuessValidationResult = {
+  valid: boolean;
+  reason?: string;
+};
+
+async function validateGuessWord(
+  guess: string,
+): Promise<GuessValidationResult> {
+  const res = await fetch(`${API_BASE}/words/validate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ word: guess }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Word validation failed: ${res.status}`);
+  }
+
+  return (await res.json()) as GuessValidationResult;
+}
+
 function Game({ isHelpOpen }: GameProps) {
   const [solution, setSolution] = useState<string>('');
   const [guesses, setGuesses] = useState<Array<string | null>>(
@@ -76,17 +97,7 @@ function Game({ isHelpOpen }: GameProps) {
       setIsSubmittingGuess(true);
 
       try {
-        const res = await fetch(`${API_BASE}/words/validate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ word: guess }),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Word validation failed: ${res.status}`);
-        }
-
-        const data: { valid: boolean; reason?: string } = await res.json();
+        const data = await validateGuessWord(guess);
 
         if (!data.valid) {
           if (data.reason === 'format') {
