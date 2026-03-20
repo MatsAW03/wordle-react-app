@@ -6,33 +6,13 @@ import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
 import { API_BASE } from './constants/api';
 import { getStoredGameStats, saveStoredGameStats } from './utils/gameStats';
+import { validateGuess } from './api/validateGuess';
 
 type GameProps = {
   isHelpOpen: boolean;
 };
 
 type GameStatus = 'playing' | 'won' | 'lost';
-
-type GuessValidationResult = {
-  valid: boolean;
-  reason?: string;
-};
-
-async function validateGuessWord(
-  guess: string,
-): Promise<GuessValidationResult> {
-  const res = await fetch(`${API_BASE}/words/validate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ word: guess }),
-  });
-
-  if (!res.ok) {
-    throw new Error(`Word validation failed: ${res.status}`);
-  }
-
-  return (await res.json()) as GuessValidationResult;
-}
 
 function Game({ isHelpOpen }: GameProps) {
   const [solution, setSolution] = useState<string>('');
@@ -97,10 +77,10 @@ function Game({ isHelpOpen }: GameProps) {
       setIsSubmittingGuess(true);
 
       try {
-        const data = await validateGuessWord(guess);
+        const validationResult = await validateGuess(guess);
 
-        if (!data.valid) {
-          if (data.reason === 'format') {
+        if (!validationResult.valid) {
+          if (validationResult.reason === 'format') {
             showMessage(`Word must be of length ${WORD_LENGTH}`);
           } else {
             showMessage('Word not recognized');
