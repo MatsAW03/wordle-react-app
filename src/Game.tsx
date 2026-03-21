@@ -4,9 +4,9 @@ import Row from './Row';
 import Keyboard from './Keyboard';
 import { WORD_LENGTH, MAX_GUESSES } from './constants/game';
 import { buildUsedKeys } from './utils/buildUsedKeys';
-import { API_BASE } from './constants/api';
 import { getStoredGameStats, saveStoredGameStats } from './utils/gameStats';
 import { validateGuess } from './api/validateGuess';
+import { getRandomWord } from './api/getRandomWord';
 
 type GameProps = {
   isHelpOpen: boolean;
@@ -57,10 +57,8 @@ function Game({ isHelpOpen }: GameProps) {
   }, []);
 
   const setRandomSolution = useCallback(async () => {
-    const res = await fetch(`${API_BASE}/words/random`);
-    if (!res.ok) throw new Error(`Failed to fetch random word: ${res.status}`);
-    const data: { word: string } = await res.json();
-    setSolution(data.word);
+    const randomWord = await getRandomWord();
+    setSolution(randomWord);
   }, []);
 
   const submitGuess = useCallback(
