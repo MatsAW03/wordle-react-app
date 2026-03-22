@@ -91,6 +91,27 @@ function Game({ isHelpOpen }: GameProps) {
     }
   }, [streak, bestStreak, showMessage]);
 
+  const handleLoss = useCallback(() => {
+    setGameStatus('lost');
+    setStreak(0);
+
+    try {
+      const stats = getStoredGameStats();
+
+      saveStoredGameStats({
+        ...stats,
+        gamesPlayed: stats.gamesPlayed + 1,
+        losses: stats.losses + 1,
+        currentStreak: 0,
+      });
+    } catch (e) {
+      console.error(e);
+      showMessage('An error occurred when saving game stats');
+    }
+
+    showMessage(`Out of guesses! 😔 The word was ${solution.toUpperCase()}`);
+  }, [showMessage, solution]);
+
   const submitGuess = useCallback(
     async (guess: string) => {
       if (isSubmittingGuess) return;
@@ -129,26 +150,7 @@ function Game({ isHelpOpen }: GameProps) {
         if (isCorrect) {
           handleWin();
         } else if (isLastGuess) {
-          setGameStatus('lost');
-          setStreak(0);
-
-          try {
-            const stats = getStoredGameStats();
-
-            saveStoredGameStats({
-              ...stats,
-              gamesPlayed: stats.gamesPlayed + 1,
-              losses: stats.losses + 1,
-              currentStreak: 0,
-            });
-          } catch (e) {
-            console.error(e);
-            showMessage('An error occurred when saving game stats');
-          }
-
-          showMessage(
-            `Out of guesses! 😔 The word was ${solution.toUpperCase()}`,
-          );
+          handleLoss();
         }
 
         setCurrentGuess('');
@@ -159,7 +161,7 @@ function Game({ isHelpOpen }: GameProps) {
         setIsSubmittingGuess(false);
       }
     },
-    [guesses, solution, showMessage, isSubmittingGuess, handleWin],
+    [guesses, solution, showMessage, isSubmittingGuess, handleWin, handleLoss],
   );
 
   const handleInput = useCallback(
