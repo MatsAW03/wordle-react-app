@@ -61,6 +61,36 @@ function Game({ isHelpOpen }: GameProps) {
     setSolution(randomWord);
   }, []);
 
+  const handleWin = useCallback(() => {
+    const nextStreak = streak + 1;
+    const nextBestStreak = Math.max(bestStreak, nextStreak);
+
+    setStreak(nextStreak);
+    setBestStreak(nextBestStreak);
+    setGameStatus('won');
+
+    try {
+      const stats = getStoredGameStats();
+
+      saveStoredGameStats({
+        ...stats,
+        gamesPlayed: stats.gamesPlayed + 1,
+        wins: stats.wins + 1,
+        currentStreak: nextStreak,
+        bestStreak: nextBestStreak,
+      });
+    } catch (e) {
+      console.error(e);
+      showMessage('An error occurred when saving game stats');
+    }
+
+    if (nextBestStreak > bestStreak) {
+      showMessage('You won! 🎉 New best streak!');
+    } else {
+      showMessage('You won! 🎉');
+    }
+  }, [streak, bestStreak, showMessage]);
+
   const submitGuess = useCallback(
     async (guess: string) => {
       if (isSubmittingGuess) return;
@@ -97,33 +127,7 @@ function Game({ isHelpOpen }: GameProps) {
         const isLastGuess = guessIndex === MAX_GUESSES - 1;
 
         if (isCorrect) {
-          const nextStreak = streak + 1;
-          const nextBestStreak = Math.max(bestStreak, nextStreak);
-
-          setStreak(nextStreak);
-          setBestStreak(nextBestStreak);
-          setGameStatus('won');
-
-          try {
-            const stats = getStoredGameStats();
-
-            saveStoredGameStats({
-              ...stats,
-              gamesPlayed: stats.gamesPlayed + 1,
-              wins: stats.wins + 1,
-              currentStreak: nextStreak,
-              bestStreak: nextBestStreak,
-            });
-          } catch (e) {
-            console.error(e);
-            showMessage('An error occurred when saving game stats');
-          }
-
-          if (nextBestStreak > bestStreak) {
-            showMessage('You won! 🎉 New best streak!');
-          } else {
-            showMessage('You won! 🎉');
-          }
+          handleWin();
         } else if (isLastGuess) {
           setGameStatus('lost');
           setStreak(0);
@@ -155,7 +159,7 @@ function Game({ isHelpOpen }: GameProps) {
         setIsSubmittingGuess(false);
       }
     },
-    [guesses, solution, showMessage, streak, bestStreak, isSubmittingGuess],
+    [guesses, solution, showMessage, isSubmittingGuess, handleWin],
   );
 
   const handleInput = useCallback(
