@@ -33,7 +33,7 @@ function Game({ isHelpOpen }: GameProps) {
   const [message, setMessage] = useState<string>('');
   const [isMessageFading, setIsMessageFading] = useState<boolean>(false);
 
-  const fadeTimeOutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fadeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clearTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isGameOver = gameStatus !== 'playing';
@@ -42,22 +42,32 @@ function Game({ isHelpOpen }: GameProps) {
     return buildUsedKeys(guesses, solution);
   }, [guesses, solution]);
 
-  const showMessage = useCallback((text: string) => {
-    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
+  const clearMessageTimeouts = useCallback(() => {
+    if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
 
-    setMessage(text);
-    setIsMessageFading(false);
-
-    fadeTimeOutRef.current = setTimeout(() => {
-      setIsMessageFading(true);
-    }, 1000);
-
-    clearTimeoutRef.current = setTimeout(() => {
-      setMessage('');
-      setIsMessageFading(false);
-    }, 2000);
+    fadeTimeoutRef.current = null;
+    clearTimeoutRef.current = null;
   }, []);
+
+  const showMessage = useCallback(
+    (text: string) => {
+      clearMessageTimeouts();
+
+      setMessage(text);
+      setIsMessageFading(false);
+
+      fadeTimeoutRef.current = setTimeout(() => {
+        setIsMessageFading(true);
+      }, 1000);
+
+      clearTimeoutRef.current = setTimeout(() => {
+        setMessage('');
+        setIsMessageFading(false);
+      }, 2000);
+    },
+    [clearMessageTimeouts],
+  );
 
   const setRandomSolution = useCallback(async () => {
     const randomWord = await getRandomWord();
@@ -201,10 +211,7 @@ function Game({ isHelpOpen }: GameProps) {
     setGuesses(Array(MAX_GUESSES).fill(null));
     setCurrentGuess('');
 
-    if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
-    if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
-    fadeTimeOutRef.current = null;
-    clearTimeoutRef.current = null;
+    clearMessageTimeouts();
 
     setMessage('');
     setIsMessageFading(false);
@@ -220,10 +227,9 @@ function Game({ isHelpOpen }: GameProps) {
 
   useEffect(() => {
     return () => {
-      if (fadeTimeOutRef.current) clearTimeout(fadeTimeOutRef.current);
-      if (clearTimeoutRef.current) clearTimeout(clearTimeoutRef.current);
+      clearMessageTimeouts();
     };
-  }, []);
+  }, [clearMessageTimeouts]);
 
   useEffect(() => {
     const handleTyping = (event: KeyboardEvent) => {
