@@ -20,9 +20,12 @@ function Game({ isHelpOpen }: GameProps) {
     Array(MAX_GUESSES).fill(null),
   );
 
-  const initialStats = getStoredGameStats();
-  const [streak, setStreak] = useState<number>(initialStats.currentStreak);
-  const [bestStreak, setBestStreak] = useState<number>(initialStats.bestStreak);
+  const [streak, setStreak] = useState<number>(() => {
+    return getStoredGameStats().currentStreak;
+  });
+  const [bestStreak, setBestStreak] = useState<number>(() => {
+    return getStoredGameStats().bestStreak;
+  });
 
   const [currentGuess, setCurrentGuess] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
